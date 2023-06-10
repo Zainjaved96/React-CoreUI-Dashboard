@@ -43,7 +43,7 @@ import avatar6 from 'src/assets/images/avatars/6.jpg'
 
 
 
-const Dashboard = () => {
+const Articles = () => {
   
 
   const tableExample = [
@@ -139,6 +139,7 @@ const Dashboard = () => {
 
   return (
     <>
+    <h3 className='text-center'>Articles</h3>
       <CRow>
         <CCol xs>
           <CCard className="mb-4">
@@ -208,4 +209,4 @@ const Dashboard = () => {
   )
 }
 
-export default Dashboard
+export default Articles

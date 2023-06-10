@@ -47,12 +47,21 @@ const Alerts = React.lazy(() => import('./views/notifications/alerts/Alerts'))
 const Badges = React.lazy(() => import('./views/notifications/badges/Badges'))
 const Modals = React.lazy(() => import('./views/notifications/modals/Modals'))
 const Toasts = React.lazy(() => import('./views/notifications/toasts/Toasts'))
-
 const Widgets = React.lazy(() => import('./views/widgets/Widgets'))
+
+
+// Pages
+
+const Reporters = React.lazy(()=>import('./views/pages/dashboard/Reporters'))
+const Articles = React.lazy(()=>import('./views/pages/dashboard/Articles'))
+const Publishers = React.lazy(()=>import('./views/pages/dashboard/Publishers'))
 
 const routes = [
   { path: '/', exact: true, name: 'Home' },
-  { path: '/dashboard', name: 'Dashboard', element: Dashboard },
+  { path: '/reporters', name: 'Reporters', element: Reporters },
+  { path: '/articles', name: 'Articles', element: Articles },
+  { path: '/publishers', name: 'Articles', element: Publishers },
+
   { path: '/theme', name: 'Theme', element: Colors, exact: true },
   { path: '/theme/colors', name: 'Colors', element: Colors },
   { path: '/theme/typography', name: 'Typography', element: Typography },
