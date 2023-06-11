@@ -1,11 +1,19 @@
 import React from 'react'
-
+import { useState, useEffect } from 'react'
+import axios from 'axios'
 import {
-  CAvatar,
+ 
+  CModal,
+  CModalHeader,
+  
+  CButton,
+  CModalTitle,
+ 
+  CModalBody,
   CCard,
   CCardBody,
   CCol,
-  CProgress,
+
   CRow,
   CTable,
   CTableBody,
@@ -15,198 +23,332 @@ import {
   CTableRow,
 } from '@coreui/react'
 
-import CIcon from '@coreui/icons-react'
-import {
-  cibCcAmex,
-  cibCcApplePay,
-  cibCcMastercard,
-  cibCcPaypal,
-  cibCcStripe,
-  cibCcVisa,
-  cifBr,
-  cifEs,
-  cifFr,
-  cifIn,
-  cifPl,
-  cifUs,
-
-  cilPeople,
-
-} from '@coreui/icons'
-
-import avatar1 from 'src/assets/images/avatars/1.jpg'
-import avatar2 from 'src/assets/images/avatars/2.jpg'
-import avatar3 from 'src/assets/images/avatars/3.jpg'
-import avatar4 from 'src/assets/images/avatars/4.jpg'
-import avatar5 from 'src/assets/images/avatars/5.jpg'
-import avatar6 from 'src/assets/images/avatars/6.jpg'
 
 
+const Reporters = () => {
+  const [searchQuery, setSearchQuery] = useState('')
+  const [url, setUrl] = useState(`http://127.0.0.1:8000/blog_service/reporter/?search_key=`)
+  const [count, setCount] = useState(0)
+  const [next, setNext] = useState(null)
+  const [prev, setPrev] = useState(null)
+  const [isLoading, setIsLoading] = useState(true)
+  const [updating, setUpdating] = useState(false)
+  const [updateId, setUpdateId] = useState(false)
+  const [users, setUsers] = useState(null)
+  const [firstName, setFirstName] = useState('')
+  const [lastName, setLastName] = useState('')
+  const [email, setEmail] = useState('')
+  const [company, setCompany] = useState('')
+  const [show, setShow] = useState(false)
+  const [formSubmitted, setFormSubmitted] = useState(false)
+ 
 
-const Articles = () => {
+  //   Handling Modal
+  const handleClose = () => setShow(false)
+  const handleShow = () => setShow(true)
+
+  const fetchData = async (url) => {
+    console.log(searchQuery)
+    try {
+      if (searchQuery != ''){
+        url = url + searchQuery
+      }
+      
+      const response = await axios.get(url)
+
+      setUsers(response.data.results.reverse())
+      setCount(response.data.count)
+      setNext(response.data.next)
+      setPrev(response.data.previous)
+      setIsLoading(false)
+    } catch (error) {
+      console.error('Error fetching data:', error)
+    }
+  }
+
+  useEffect(() => {
+    fetchData(url)
+  }, [searchQuery])
+
+  useEffect(() => {
+    fetchData(url)
+    setFormSubmitted(false)
+  }, [formSubmitted])
+
+  const handleSubmit = async (event) => {
+    event.preventDefault()
+    const newUser = {
+      first_name: firstName,
+      last_name: lastName,
+      email: email,
+      company: company,
+    }
+
+    if (updating) {
+      try {
+        
+        await axios.put(`http://127.0.0.1:8000/blog_service/reporter/${updateId}`, newUser)
+        fetchData(url)
+        // Reset the form after successful submission
+
+        showNoti('updateNotification')
+        setUpdating(false)
+      } catch (error) {
+        console.error('Error adding user:', error)
+        alert('BAD REQUEST')
+      }
+    } else {
+      try {
+        await axios.post('http://127.0.0.1:8000/blog_service/reporter/', newUser)
+        showNoti('successNotification')
+      } catch (error) {
+        console.error('Error adding user:', error)
+        alert('BAD REQUEST')
+      }
+    }
+    handleClose()
+    setFormSubmitted(true)
+    setFirstName('')
+    setLastName('')
+    setEmail('')
+    setCompany('')
+  }
+
+  function showNoti(id) {
+    const noti = document.getElementById(id)
+    noti.classList.remove('d-none')
+    setTimeout(function () {
+      noti.classList.add('d-none')
+    }, 2000)
+  }
+
+  const handleDelete = async (event) => {
+    const userId = event.target.id
+    try {
+      const response = await axios.delete(`http://127.0.0.1:8000/blog_service/reporter/${userId}`)
+      showNoti('deleteNotification')
+      fetchData(url)
+
+      // Reset the form after successful submission
+    } catch (error) {
+      console.error('Error adding user:', error)
+    }
+  }
+
+  const handleEdit = async (event) => {
+    handleShow()
+    // Fetching data to store in the form
+    const userId = event.target.id
+
+    const first_name = event.target.closest('.reporter-row').querySelector('.first-name').textContent
+    const last_name = event.target.closest('.reporter-row').querySelector('.last-name').textContent
+    const email = event.target.closest('.reporter-row').querySelector('.email').textContent
+    const company = event.target.closest('.reporter-row').querySelector('.company').textContent
+
+    setFirstName(first_name)
+    setLastName(last_name)
+    setEmail(email)
+    setUpdating(true)
+    setUpdateId(userId)
+    setCompany(company)
+  }
+
+  const handleNext = () => {
+    if (next) {
+      setUrl(next)
+      fetchData(next)
+    }
+  }
+
+  const handlePrev = () => {
+    if (prev) {
+      setUrl(prev)
+      fetchData(prev)
+    }
+  }
+
   
-
-  const tableExample = [
-    {
-      avatar: { src: avatar1, status: 'success' },
-      user: {
-        name: 'Yiorgos Avraamu',
-        new: true,
-        registered: 'Jan 1, 2021',
-      },
-      country: { name: 'USA', flag: cifUs },
-      usage: {
-        value: 50,
-        period: 'Jun 11, 2021 - Jul 10, 2021',
-        color: 'success',
-      },
-      payment: { name: 'Mastercard', icon: cibCcMastercard },
-      activity: '10 sec ago',
-    },
-    {
-      avatar: { src: avatar2, status: 'danger' },
-      user: {
-        name: 'Avram Tarasios',
-        new: false,
-        registered: 'Jan 1, 2021',
-      },
-      country: { name: 'Brazil', flag: cifBr },
-      usage: {
-        value: 22,
-        period: 'Jun 11, 2021 - Jul 10, 2021',
-        color: 'info',
-      },
-      payment: { name: 'Visa', icon: cibCcVisa },
-      activity: '5 minutes ago',
-    },
-    {
-      avatar: { src: avatar3, status: 'warning' },
-      user: { name: 'Quintin Ed', new: true, registered: 'Jan 1, 2021' },
-      country: { name: 'India', flag: cifIn },
-      usage: {
-        value: 74,
-        period: 'Jun 11, 2021 - Jul 10, 2021',
-        color: 'warning',
-      },
-      payment: { name: 'Stripe', icon: cibCcStripe },
-      activity: '1 hour ago',
-    },
-    {
-      avatar: { src: avatar4, status: 'secondary' },
-      user: { name: 'Enéas Kwadwo', new: true, registered: 'Jan 1, 2021' },
-      country: { name: 'France', flag: cifFr },
-      usage: {
-        value: 98,
-        period: 'Jun 11, 2021 - Jul 10, 2021',
-        color: 'danger',
-      },
-      payment: { name: 'PayPal', icon: cibCcPaypal },
-      activity: 'Last month',
-    },
-    {
-      avatar: { src: avatar5, status: 'success' },
-      user: {
-        name: 'Agapetus Tadeáš',
-        new: true,
-        registered: 'Jan 1, 2021',
-      },
-      country: { name: 'Spain', flag: cifEs },
-      usage: {
-        value: 22,
-        period: 'Jun 11, 2021 - Jul 10, 2021',
-        color: 'primary',
-      },
-      payment: { name: 'Google Wallet', icon: cibCcApplePay },
-      activity: 'Last week',
-    },
-    {
-      avatar: { src: avatar6, status: 'danger' },
-      user: {
-        name: 'Friderik Dávid',
-        new: true,
-        registered: 'Jan 1, 2021',
-      },
-      country: { name: 'Poland', flag: cifPl },
-      usage: {
-        value: 43,
-        period: 'Jun 11, 2021 - Jul 10, 2021',
-        color: 'success',
-      },
-      payment: { name: 'Amex', icon: cibCcAmex },
-      activity: 'Last week',
-    },
-  ]
 
   return (
     <>
-    <h3 className='text-center'>Articles</h3>
+      {/* Notifications */}
+      <div
+        id="successNotification"
+        className="fixed-top w-25  alert bg-primary text-white d-none "
+        role="alert"
+        style={{
+          left: '1000px',
+          top: '55px',
+        }}
+      >
+        Item Added successfully!
+      </div>
+      <div
+        id="updateNotification"
+        className="fixed-top w-25  alert bg-primary text-white d-none "
+        role="alert"
+        style={{
+          left: '1000px',
+          top: '55px',
+        }}
+      >
+        Item Updated successfully!
+      </div>
+      <div
+        id="deleteNotification"
+        className="fixed-top w-25  alert bg-danger text-white d-none "
+        role="alert"
+        style={{
+          left: '1000px',
+          top: '55px',
+        }}
+      >
+        Item deleted successfully!
+      </div>
+
+      {/* Modal */}
+      <CModal visible={show} onClose={() => setShow(false)}>
+        <CModalHeader onClose={() => setShow(false)}>
+          <CModalTitle>Reporter Form</CModalTitle>
+        </CModalHeader>
+        <CModalBody>
+          <form className="col-lg-8 mx-auto needs-validation" onSubmit={handleSubmit}>
+            <div className="mb-3">
+              <label htmlFor="firstName" className="form-label">
+                First Name
+              </label>
+              <input
+                type="text"
+                className="form-control"
+                id="firstName"
+                value={firstName}
+                onChange={(e) => setFirstName(e.target.value)}
+                required
+                placeholder="Steven"
+              />
+            </div>
+            <div className="mb-3">
+              <label htmlFor="lastName" className="form-label">
+                Last Name
+              </label>
+              <input
+                type="text"
+                className="form-control"
+                id="lastName"
+                value={lastName}
+                onChange={(e) => setLastName(e.target.value)}
+                required
+                placeholder="Smith"
+              />
+            </div>
+            <div className="mb-3">
+              <label htmlFor="company" className="form-label">
+                Company
+              </label>
+              <input
+                type="text"
+                className="form-control"
+                id="company"
+                value={company}
+                onChange={(e) => setCompany(e.target.value)}
+                required
+                placeholder="CNN"
+              />
+            </div>
+            <div className="mb-3">
+              <label htmlFor="email" className="form-label">
+                Email address
+              </label>
+              <input
+                type="email"
+                className="form-control"
+                id="email"
+                value={email}
+                onChange={(e) => {
+                  setEmail(e.target.value)
+                }}
+                required
+                placeholder="name@example.com"
+              />
+            </div>
+            <button type="submit" className="btn btn-lg btn-success text-white">
+              Submit
+            </button>
+          </form>
+        </CModalBody>
+      </CModal>
+      {/* Header */}
+      <div className="d-flex py-2 justify-content-between px-5">
+        <h3 className="text-center bg-dark px-2 text-white rounded">
+          Reporters <span className="badge badge-secondary bg-dark">{users ? count : '0'}</span>{' '}
+        </h3>
+        {/* Search box */}
+        <form className="d-flex flex-grow-1 mx-2" role="search">
+          <input  onChange={(e)=>setSearchQuery(e.target.value)} value={searchQuery}  className="form-control me-2" type="search" placeholder="Search by first or Last Name" aria-label="Search" />
+        </form>
+        <CButton onClick={() => setShow(!show)}>Add +</CButton>
+      </div>
+
+      {/* Table */}
       <CRow>
         <CCol xs>
           <CCard className="mb-4">
-          
             <CCardBody>
-              
-
               <br />
 
-              <CTable align="middle" className="mb-0 border" hover responsive>
+              <CTable className="mb-0 border" align="middle" hover responsive>
                 <CTableHead color="light">
                   <CTableRow>
-                    <CTableHeaderCell className="text-center">
-                      <CIcon icon={cilPeople} />
-                    </CTableHeaderCell>
-                    <CTableHeaderCell>User</CTableHeaderCell>
-                    <CTableHeaderCell className="text-center">Country</CTableHeaderCell>
-                    <CTableHeaderCell>Usage</CTableHeaderCell>
-                    <CTableHeaderCell className="text-center">Payment Method</CTableHeaderCell>
-                    <CTableHeaderCell>Activity</CTableHeaderCell>
+                    <CTableHeaderCell>id</CTableHeaderCell>
+                    <CTableHeaderCell>First Name</CTableHeaderCell>
+                    <CTableHeaderCell>Last Name</CTableHeaderCell>
+                    <CTableHeaderCell>Email</CTableHeaderCell>
+                    <CTableHeaderCell>Company</CTableHeaderCell>
+                    <CTableHeaderCell>Actions</CTableHeaderCell>
                   </CTableRow>
                 </CTableHead>
                 <CTableBody>
-                  {tableExample.map((item, index) => (
-                    <CTableRow v-for="item in tableItems" key={index}>
-                      <CTableDataCell className="text-center">
-                        <CAvatar size="md" src={item.avatar.src} status={item.avatar.status} />
-                      </CTableDataCell>
-                      <CTableDataCell>
-                        <div>{item.user.name}</div>
-                        <div className="small text-medium-emphasis">
-                          <span>{item.user.new ? 'New' : 'Recurring'}</span> | Registered:{' '}
-                          {item.user.registered}
-                        </div>
-                      </CTableDataCell>
-                      <CTableDataCell className="text-center">
-                        <CIcon size="xl" icon={item.country.flag} title={item.country.name} />
-                      </CTableDataCell>
-                      <CTableDataCell>
-                        <div className="clearfix">
-                          <div className="float-start">
-                            <strong>{item.usage.value}%</strong>
-                          </div>
-                          <div className="float-end">
-                            <small className="text-medium-emphasis">{item.usage.period}</small>
-                          </div>
-                        </div>
-                        <CProgress thin color={item.usage.color} value={item.usage.value} />
-                      </CTableDataCell>
-                      <CTableDataCell className="text-center">
-                        <CIcon size="xl" icon={item.payment.icon} />
-                      </CTableDataCell>
-                      <CTableDataCell>
-                        <div className="small text-medium-emphasis">Last login</div>
-                        <strong>{item.activity}</strong>
-                      </CTableDataCell>
-                    </CTableRow>
-                  ))}
+                  {users == null
+                    ? 'Loading'
+                    : users.map((user, index) => (
+                        <CTableRow className="reporter-row" key={user.id}>
+                          <CTableDataCell className="user-id">{user.id}</CTableDataCell>
+                          <CTableDataCell className="first-name">{user.first_name}</CTableDataCell>
+                          <CTableDataCell className="last-name">{user.last_name}</CTableDataCell>
+                          <CTableDataCell className="email">{user.email}</CTableDataCell>
+                          <CTableDataCell className="company">{user.company}</CTableDataCell>
+                          <CTableDataCell>
+                            <div className="d-flex gap-2">
+                              <button className="btn btn-dark">info</button>
+                              <button id={user.id} onClick={handleEdit} className="btn btn-primary text-white">
+                                Edit
+                              </button>
+                              <button id={user.id} className="btn btn-danger text-white" onClick={handleDelete}>
+                                Delete
+                              </button>
+                            </div>
+                          </CTableDataCell>
+                          {/* Add more table cells as needed */}
+                        </CTableRow>
+                      ))}
                 </CTableBody>
               </CTable>
             </CCardBody>
-
           </CCard>
         </CCol>
       </CRow>
+
+      {/* Pagination */}
+      <div className="d-flex text-center col-lg-7 container flex-row-reverse justify-content-between">
+        <a className={`btn btn-md ${!next ? 'disabled' : 'd-block'} btn-primary mx-2`} onClick={handleNext}>
+          Next
+        </a>
+        <a className={`btn btn-md ${!prev ? 'disabled' : 'd-block'} btn-primary mx-2`} onClick={handlePrev}>
+          Previous
+        </a>
+      </div>
     </>
   )
 }
 
-export default Articles
+export default Reporters

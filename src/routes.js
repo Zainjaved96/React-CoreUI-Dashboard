@@ -60,7 +60,7 @@ const routes = [
   { path: '/', exact: true, name: 'Home' },
   { path: '/reporters', name: 'Reporters', element: Reporters },
   { path: '/articles', name: 'Articles', element: Articles },
-  { path: '/publishers', name: 'Articles', element: Publishers },
+  { path: '/publishers', name: 'Publishers', element: Publishers },
 
   { path: '/theme', name: 'Theme', element: Colors, exact: true },
   { path: '/theme/colors', name: 'Colors', element: Colors },
