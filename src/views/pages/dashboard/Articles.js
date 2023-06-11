@@ -27,7 +27,7 @@ import {
 
 const Reporters = () => {
   const [searchQuery, setSearchQuery] = useState('')
-  const [url, setUrl] = useState(`http://127.0.0.1:8000/blog_service/reporter/?search_key=`)
+  const [url, setUrl] = useState(`http://127.0.0.1:8000/blog_service/article/?search_key=`)
   const [count, setCount] = useState(0)
   const [next, setNext] = useState(null)
   const [prev, setPrev] = useState(null)
@@ -35,10 +35,16 @@ const Reporters = () => {
   const [updating, setUpdating] = useState(false)
   const [updateId, setUpdateId] = useState(false)
   const [users, setUsers] = useState(null)
-  const [firstName, setFirstName] = useState('')
-  const [lastName, setLastName] = useState('')
-  const [email, setEmail] = useState('')
-  const [company, setCompany] = useState('')
+  const [headline, setHeadline] = useState('')
+  const [details, setDetails] = useState('')
+  const [date, setDate] = useState('')
+
+  const[reporterId, setReporterId] = useState(null)
+  const [reporters, setReporters] = useState([])
+
+  const [publishers, setPublishers]= useState([])
+  const [selectedPublisher, setSelectedPublisher] = useState([])
+  
   const [show, setShow] = useState(false)
   const [formSubmitted, setFormSubmitted] = useState(false)
  
@@ -68,8 +74,21 @@ const Reporters = () => {
 
   useEffect(() => {
     fetchData(url)
+    fetchReporters()
+   
   }, [searchQuery])
 
+  const fetchReporters  = async () => {
+    
+    try {
+      
+      const response = await axios.get('http://127.0.0.1:8000/blog_service/reporter/')
+      setReporters(response.data.results)
+      console.log(reporters)
+    } catch (error) {
+      console.error('Error fetching data:', error)
+    }
+  }
   useEffect(() => {
     fetchData(url)
     setFormSubmitted(false)
@@ -78,16 +97,18 @@ const Reporters = () => {
   const handleSubmit = async (event) => {
     event.preventDefault()
     const newUser = {
-      first_name: firstName,
-      last_name: lastName,
-      email: email,
-      company: company,
+      headline: headline,
+      details: details,
+      reporter: reporterId,
+      publisher: [
+        16
+      ],
     }
 
     if (updating) {
       try {
         
-        await axios.put(`http://127.0.0.1:8000/blog_service/reporter/${updateId}`, newUser)
+        await axios.put(`http://127.0.0.1:8000/blog_service/article/${updateId}`, newUser)
         fetchData(url)
         // Reset the form after successful submission
 
@@ -99,7 +120,7 @@ const Reporters = () => {
       }
     } else {
       try {
-        await axios.post('http://127.0.0.1:8000/blog_service/reporter/', newUser)
+        await axios.post('http://127.0.0.1:8000/blog_service/article/', newUser)
         showNoti('successNotification')
       } catch (error) {
         console.error('Error adding user:', error)
@@ -108,10 +129,9 @@ const Reporters = () => {
     }
     handleClose()
     setFormSubmitted(true)
-    setFirstName('')
-    setLastName('')
-    setEmail('')
-    setCompany('')
+    setHeadline('')
+    setDetails('')
+
   }
 
   function showNoti(id) {
@@ -125,7 +145,7 @@ const Reporters = () => {
   const handleDelete = async (event) => {
     const userId = event.target.id
     try {
-      const response = await axios.delete(`http://127.0.0.1:8000/blog_service/reporter/${userId}`)
+      const response = await axios.delete(`http://127.0.0.1:8000/blog_service/article/${userId}`)
       showNoti('deleteNotification')
       fetchData(url)
 
@@ -140,17 +160,16 @@ const Reporters = () => {
     // Fetching data to store in the form
     const userId = event.target.id
 
-    const first_name = event.target.closest('.reporter-row').querySelector('.first-name').textContent
-    const last_name = event.target.closest('.reporter-row').querySelector('.last-name').textContent
-    const email = event.target.closest('.reporter-row').querySelector('.email').textContent
-    const company = event.target.closest('.reporter-row').querySelector('.company').textContent
+    const headline = event.target.closest('.article-row').querySelector('.headline').textContent
+    const details = event.target.closest('.article-row').querySelector('.details').textContent
+    const reporter_id = event.target.closest('.article-row').querySelector('.reporter-id').textContent
 
-    setFirstName(first_name)
-    setLastName(last_name)
-    setEmail(email)
+    setHeadline(headline)
+    setDetails(details)
     setUpdating(true)
     setUpdateId(userId)
-    setCompany(company)
+    setReporterId(reporter_id)
+    // setCompany(company)
   }
 
   const handleNext = () => {
@@ -209,66 +228,51 @@ const Reporters = () => {
       {/* Modal */}
       <CModal visible={show} onClose={() => setShow(false)}>
         <CModalHeader onClose={() => setShow(false)}>
-          <CModalTitle>Reporter Form</CModalTitle>
+          <CModalTitle>Article Submission</CModalTitle>
         </CModalHeader>
         <CModalBody>
           <form className="col-lg-8 mx-auto needs-validation" onSubmit={handleSubmit}>
             <div className="mb-3">
-              <label htmlFor="firstName" className="form-label">
-                First Name
+              <label htmlFor="headline" className="form-label">
+                Headline
               </label>
               <input
                 type="text"
                 className="form-control"
-                id="firstName"
-                value={firstName}
-                onChange={(e) => setFirstName(e.target.value)}
+                id="headline"
+                value={headline}
+                onChange={(e) => setHeadline(e.target.value)}
                 required
-                placeholder="Steven"
+                placeholder="The is your headline"
               />
             </div>
             <div className="mb-3">
               <label htmlFor="lastName" className="form-label">
-                Last Name
+               Details
               </label>
               <input
-                type="text"
+                type="message"
                 className="form-control"
-                id="lastName"
-                value={lastName}
-                onChange={(e) => setLastName(e.target.value)}
+                id="details"
+                value={details}
+                onChange={(e) => setDetails(e.target.value)}
                 required
-                placeholder="Smith"
+                placeholder="Write your article"
               />
             </div>
+            
             <div className="mb-3">
-              <label htmlFor="company" className="form-label">
-                Company
+              <label htmlFor="lastName" className="form-label">
+               Reporter ID
               </label>
               <input
-                type="text"
+                type="number"
                 className="form-control"
-                id="company"
-                value={company}
-                onChange={(e) => setCompany(e.target.value)}
+                id="reporter"
+                value={reporterId}
+                onChange={(e) => setReporterId(e.target.value)}
                 required
-                placeholder="CNN"
-              />
-            </div>
-            <div className="mb-3">
-              <label htmlFor="email" className="form-label">
-                Email address
-              </label>
-              <input
-                type="email"
-                className="form-control"
-                id="email"
-                value={email}
-                onChange={(e) => {
-                  setEmail(e.target.value)
-                }}
-                required
-                placeholder="name@example.com"
+                placeholder="1"
               />
             </div>
             <button type="submit" className="btn btn-lg btn-success text-white">
@@ -279,9 +283,8 @@ const Reporters = () => {
       </CModal>
       {/* Header */}
       <div className="d-flex py-2 justify-content-between px-5">
-        <h3 className="text-center bg-dark px-2 text-white rounded">
-          Reporters <span className="badge badge-secondary bg-dark">{users ? count : '0'}</span>{' '}
-        </h3>
+      <CButton  >Articles<span className="badge badge-secondary bg-primary">{users ? count : '0'}</span> </CButton>
+
         {/* Search box */}
         <form className="d-flex flex-grow-1 mx-2" role="search">
           <input  onChange={(e)=>setSearchQuery(e.target.value)} value={searchQuery}  className="form-control me-2" type="search" placeholder="Search by first or Last Name" aria-label="Search" />
@@ -300,10 +303,11 @@ const Reporters = () => {
                 <CTableHead color="light">
                   <CTableRow>
                     <CTableHeaderCell>id</CTableHeaderCell>
-                    <CTableHeaderCell>First Name</CTableHeaderCell>
-                    <CTableHeaderCell>Last Name</CTableHeaderCell>
-                    <CTableHeaderCell>Email</CTableHeaderCell>
-                    <CTableHeaderCell>Company</CTableHeaderCell>
+                    <CTableHeaderCell>Headline</CTableHeaderCell>
+                    <CTableHeaderCell>Description</CTableHeaderCell>
+                    <CTableHeaderCell>Reporter id</CTableHeaderCell>
+                    <CTableHeaderCell>Written by </CTableHeaderCell>
+                    <CTableHeaderCell>Created at</CTableHeaderCell>
                     <CTableHeaderCell>Actions</CTableHeaderCell>
                   </CTableRow>
                 </CTableHead>
@@ -311,12 +315,13 @@ const Reporters = () => {
                   {users == null
                     ? 'Loading'
                     : users.map((user, index) => (
-                        <CTableRow className="reporter-row" key={user.id}>
+                        <CTableRow className="article-row" key={user.id}>
                           <CTableDataCell className="user-id">{user.id}</CTableDataCell>
-                          <CTableDataCell className="first-name">{user.first_name}</CTableDataCell>
-                          <CTableDataCell className="last-name">{user.last_name}</CTableDataCell>
-                          <CTableDataCell className="email">{user.email}</CTableDataCell>
-                          <CTableDataCell className="company">{user.company}</CTableDataCell>
+                          <CTableDataCell className="headline">{user.headline}</CTableDataCell>
+                          <CTableDataCell className="details">{user.details}</CTableDataCell>
+                          <CTableDataCell className="reporter-id">{user.reporter.id}</CTableDataCell>                          
+                          <CTableDataCell className="reporter-name">{user.reporter.first_name}</CTableDataCell>                          
+                          <CTableDataCell className="created">{user.created_at.substring(0,10)}</CTableDataCell>                        
                           <CTableDataCell>
                             <div className="d-flex gap-2">
                               <button className="btn btn-dark">info</button>

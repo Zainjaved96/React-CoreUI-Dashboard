@@ -279,7 +279,7 @@ const Publishers = () => {
       </CModal>
       {/* Header */}
       <div className="d-flex py-2 justify-content-between px-5">
-      <CButton type='danger' >Publishers <span className="badge badge-secondary bg-primary">{users ? count : '0'}</span> </CButton>
+      <CButton type='danger' >Publishers <span className="badge badge-secondary bg-dark">{users ? count : '0'}</span> </CButton>
         {/* Search box */}
         <form className="d-flex flex-grow-1 mx-2" role="search">
           <input  onChange={(e)=>setSearchQuery(e.target.value)} value={searchQuery}  className="form-control me-2" type="search" placeholder="Search by first or Last Name" aria-label="Search" />
@@ -317,8 +317,8 @@ const Publishers = () => {
                     {users.map((user, index) => (
                         <CTableRow className="reporter-row" key={user.id}>
                           <CTableDataCell className="user-id">{user.id}</CTableDataCell>
-                          <CTableDataCell className="first-name">{user.name}</CTableDataCell>
-                          <CTableDataCell className="last-name">{user.phone_no}</CTableDataCell>
+                          <CTableDataCell className="name">{user.name}</CTableDataCell>
+                          <CTableDataCell className="phone-no">{user.phone_no}</CTableDataCell>
                           <CTableDataCell className="email">{user.email}</CTableDataCell>
                           <CTableDataCell className="company">{user.company_name}</CTableDataCell>
                           <CTableDataCell>
