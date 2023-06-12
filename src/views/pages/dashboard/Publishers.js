@@ -45,7 +45,14 @@ const Publishers = () => {
  
 
   //   Handling Modal
-  const handleClose = () => setShow(false)
+  const handleClose = () => {
+   
+    setShow(false)
+    setName('')
+    setEmail('')
+    setCompany('')
+    setPhoneNo('')
+  }
   const handleShow = () => setShow(true)
 
   const fetchData = async (url) => {
@@ -226,8 +233,8 @@ const Publishers = () => {
       </div>
 
       {/* Modal */}
-      <CModal visible={show} onClose={() => setShow(false)}>
-        <CModalHeader onClose={() => setShow(false)}>
+      <CModal visible={show} onClose={handleClose}>
+        <CModalHeader onClose={handleClose}>
           <CModalTitle>Publisher Form</CModalTitle>
         </CModalHeader>
         <CModalBody>
@@ -324,9 +331,12 @@ const Publishers = () => {
                <small className="text-muted p-t-30 db">User Id:</small>
                 <h6>{updateId}</h6>
                 <small className="text-muted">Email address: </small>
-                <h6>{email}</h6> <small className="text-muted p-t-30 db">Company:</small>
+                <h6>{email}</h6> 
+                <small className="text-muted p-t-30 db">Company:</small>
                 <h6>{company}</h6> 
-                <h6>{email}</h6> <small className="text-muted p-t-30 db">Phone No:</small>
+                <small className="text-muted p-t-30 db">Email:</small>
+                <h6>{email}</h6>
+                 <small className="text-muted p-t-30 db">Phone No:</small>
                 <h6>{phoneNo}</h6> 
                 
               </div>
@@ -341,7 +351,7 @@ const Publishers = () => {
       <CButton  >Publishers <span className="badge badge-secondary bg-primary ">{users ? count : '0'}</span> </CButton>
         {/* Search box */}
         <form className="d-flex flex-grow-1 mx-2" role="search">
-          <input  onChange={(e)=>setSearchQuery(e.target.value)} value={searchQuery}  className="form-control me-2" type="search" placeholder="Search by first or Last Name" aria-label="Search" />
+          <input  onChange={(e)=>setSearchQuery(e.target.value)} value={searchQuery}  className="form-control me-2" type="search" placeholder="Search by Name or Company" aria-label="Search" />
         </form>
         <CButton onClick={() => setShow(!show)}>Add +</CButton>
       </div>

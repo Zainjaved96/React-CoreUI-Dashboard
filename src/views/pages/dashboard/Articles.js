@@ -37,7 +37,7 @@ const Reporters = () => {
   const [reporterName, setReporterName] = useState('')
   const [reporters, setReporters] = useState([])
 
-  const [publishers, setPublishers] = useState([])
+  const [publishers, setPublishers] = useState()
   const [selectedPublisher, setSelectedPublisher] = useState([])
 
   // Modal states
@@ -46,9 +46,17 @@ const Reporters = () => {
   const [formSubmitted, setFormSubmitted] = useState(false)
 
   //   Handling Modal
-  const handleClose = () => setShow(false)
+  const handleClose = () =>{ 
+    setShow(false)
+    setHeadline('')
+    setDetails('')
+    setReporterId('')
+    setSelectedPublisher([])
+  }
+
   const handleShow = () => setShow(true)
 
+  // Fetching articles data
   const fetchData = async (url) => {
     try {
       if (searchQuery != '') {
@@ -67,23 +75,11 @@ const Reporters = () => {
     }
   }
 
+  // this will update data after first rendering and
+  // anytime there's a change in search query
   useEffect(() => {
     fetchData(url)
-    fetchReporters()
   }, [searchQuery])
-
-  const fetchReporters = async () => {
-    try {
-      const response = await axios.get('http://127.0.0.1:8000/blog_service/reporter/')
-      setReporters(response.data.results)
-    } catch (error) {
-      console.error('Error fetching data:', error)
-    }
-  }
-  useEffect(() => {
-    fetchData(url)
-    setFormSubmitted(false)
-  }, [formSubmitted])
 
   const handleSubmit = async (event) => {
     event.preventDefault()
@@ -91,7 +87,7 @@ const Reporters = () => {
       headline: headline,
       details: details,
       reporter: reporterId,
-      publisher: [17, 12],
+      publisher: selectedPublisher,
     }
 
     if (updating) {
@@ -110,6 +106,7 @@ const Reporters = () => {
       try {
         await axios.post('http://127.0.0.1:8000/blog_service/article/', newUser)
         showNoti('successNotification')
+        fetchData(url)
       } catch (error) {
         console.error('Error adding user:', error)
         alert('BAD REQUEST')
@@ -150,12 +147,14 @@ const Reporters = () => {
     const headline = event.target.closest('.article-row').querySelector('.headline').textContent
     const details = event.target.closest('.article-row').querySelector('.details').textContent
     const reporter_id = event.target.closest('.article-row').querySelector('.reporter-id').textContent
+    const publisherIds = Array.from(event.target.closest('.article-row').querySelectorAll('.pub-id'), (element) => element.textContent);
 
     setHeadline(headline)
     setDetails(details)
     setUpdating(true)
     setUpdateId(userId)
     setReporterId(reporter_id)
+    setSelectedPublisher(publisherIds)
     // setCompany(company)
   }
 
@@ -169,12 +168,13 @@ const Reporters = () => {
     const details = event.target.closest('.article-row').querySelector('.details').textContent
     const reporter_id = event.target.closest('.article-row').querySelector('.reporter-id').textContent
     const reporter_name = event.target.closest('.article-row').querySelector('.reporter-name').textContent
-
+    const publishers_name = event.target.closest('.article-row').querySelector('.publisher-name').textContent
     setHeadline(headline)
     setDetails(details)
     setUpdateId(userId)
     setReporterId(reporter_id)
     setReporterName(reporter_name)
+    setPublishers(publishers_name)
   }
 
   const handleNext = () => {
@@ -190,6 +190,15 @@ const Reporters = () => {
       fetchData(prev)
     }
   }
+
+
+  const handlePublisherChange = (event) => {
+    const selectedOptions = Array.from(event.target.selectedOptions, (option) =>
+      option.value
+    );
+    setSelectedPublisher(selectedOptions);
+  };
+
 
   return (
     <>
@@ -231,8 +240,8 @@ const Reporters = () => {
       {/* Modal */}
 
       {/* Table Modal */}
-      <CModal visible={show} onClose={() => setShow(false)}>
-        <CModalHeader onClose={() => setShow(false)}>
+      <CModal visible={show} onClose={handleClose}>
+        <CModalHeader onClose={handleClose}>
           <CModalTitle>Article Submission</CModalTitle>
         </CModalHeader>
         <CModalBody>
@@ -278,6 +287,16 @@ const Reporters = () => {
                 placeholder="1"
               />
             </div>
+            <div className="mb-3">
+              <select className='form-control' name="publisher" multiple value={selectedPublisher} onChange={handlePublisherChange}>
+                {Array.from({ length: 100 }, (_, index) => (
+                  <option key={index + 1} value={index + 1}>
+                    Publisher {index + 1}
+                  </option>
+                ))}
+              </select>
+            </div>
+
             <button type="submit" className="btn btn-lg btn-success text-white">
               Submit
             </button>
@@ -285,7 +304,7 @@ const Reporters = () => {
         </CModalBody>
       </CModal>
 
-      {/* Info Modal */}
+     
       {/* Info Modal */}
       <CModal visible={showInfo} onClose={() => setShowInfo(false)}>
         <CModalHeader onClose={() => setShow(false)}></CModalHeader>
@@ -293,7 +312,7 @@ const Reporters = () => {
           <div className="">
             <div className="card">
               <div className="card-body p-2 m-0">
-                <h3 className="card-title">{headline}</h3>
+                <h3 className="card-title px-2 text-center">{headline}</h3>
               </div>
               <div>
                 <hr />
@@ -303,8 +322,10 @@ const Reporters = () => {
                 <h6>{details}</h6>
                 <small className="text-muted p-t-30 db">Article Id</small>
                 <h6>{updateId}</h6>
-                <small className="text-muted">Reporter Name</small>
+                <small className="text-muted">Reporter:</small>
                 <h6>{reporterName}</h6>
+                <small className="text-muted">Publishers:</small>
+                <h6>{publishers}</h6>
               </div>
             </div>
           </div>
@@ -324,7 +345,7 @@ const Reporters = () => {
             value={searchQuery}
             className="form-control me-2"
             type="search"
-            placeholder="Search by first or Last Name"
+            placeholder="Search by word in headline"
             aria-label="Search"
           />
         </form>
@@ -344,42 +365,55 @@ const Reporters = () => {
                     <CTableHeaderCell>id</CTableHeaderCell>
                     <CTableHeaderCell>Headline</CTableHeaderCell>
                     <CTableHeaderCell>Description</CTableHeaderCell>
-                    <CTableHeaderCell>Reporter id</CTableHeaderCell>
+                    <CTableHeaderCell className='d-none'>Reporter id</CTableHeaderCell>
                     <CTableHeaderCell>Written by </CTableHeaderCell>
+                    <CTableHeaderCell>Published by </CTableHeaderCell>
+                    <CTableHeaderCell className='d-none'>Publishers id</CTableHeaderCell>
+
                     <CTableHeaderCell>Created at</CTableHeaderCell>
                     <CTableHeaderCell>Actions</CTableHeaderCell>
                   </CTableRow>
                 </CTableHead>
                 <CTableBody>
-                  {users == null
-                    ? <div className="spinner-border d-flex justify-content-center " role="status">
-                        <span className="sr-only"></span>
-                      </div>
-                    : users.map((user, index) => (
-                        <CTableRow className="article-row" key={user.id}>
-                          <CTableDataCell className="user-id">{user.id}</CTableDataCell>
-                          <CTableDataCell className="headline">{user.headline}</CTableDataCell>
-                          <CTableDataCell>{user.details.substring(0, 10)}</CTableDataCell>
-                          <CTableDataCell className="details d-none">{user.details}</CTableDataCell>
-                          <CTableDataCell className="reporter-id">{user.reporter.id}</CTableDataCell>
-                          <CTableDataCell className="reporter-name">{user.reporter.first_name}</CTableDataCell>
-                          <CTableDataCell className="created">{user.created_at.substring(0, 10)}</CTableDataCell>
-                          <CTableDataCell>
-                            <div className="d-flex gap-2">
-                              <button id={user.id} onClick={handleInfo} className="btn btn-dark">
-                                info
-                              </button>
-                              <button id={user.id} onClick={handleEdit} className="btn btn-primary text-white">
-                                Edit
-                              </button>
-                              <button id={user.id} className="btn btn-danger text-white" onClick={handleDelete}>
-                                Delete
-                              </button>
-                            </div>
+                  {users == null ? (
+                    <div className="spinner-border d-flex justify-content-center " role="status">
+                      <span className="sr-only"></span>
+                    </div>
+                  ) : (
+                    users.map((user, index) => (
+                      <CTableRow className="article-row" key={user.id}>
+                        <CTableDataCell className="user-id">{user.id}</CTableDataCell>
+                        <CTableDataCell className="headline">{user.headline}</CTableDataCell>
+                        <CTableDataCell>{user.details.substring(0, 30)}...</CTableDataCell>
+                        <CTableDataCell className="details d-none">{user.details}</CTableDataCell>
+                        <CTableDataCell className="reporter-id d-none">{user.reporter.id}</CTableDataCell>
+                        <CTableDataCell className="reporter-name">{user.reporter.first_name}</CTableDataCell>
+                        <CTableDataCell className="publisher-name">
+                          <div className='d-flex flex-column '>
+                          {  user.publisher.map((pub) => <div key={pub.id}>{`${pub.name} `}</div>)}
+                          </div>
                           </CTableDataCell>
-                          {/* Add more table cells as needed */}
-                        </CTableRow>
-                      ))}
+                        <CTableDataCell className="publisher-id d-none ">{user.publisher.map((pub, index) =>
+                         <div key={pub.id} className='pub-id'>{pub.id}</div>
+                         )}</CTableDataCell>
+                        <CTableDataCell className="created">{user.created_at.substring(0, 10)}</CTableDataCell>
+                        <CTableDataCell>
+                          <div className="d-flex gap-2">
+                            <button id={user.id} onClick={handleInfo} className="btn btn-dark">
+                              info
+                            </button>
+                            <button id={user.id} onClick={handleEdit} className="btn btn-primary text-white">
+                              Edit
+                            </button>
+                            <button id={user.id} className="btn btn-danger text-white" onClick={handleDelete}>
+                              Delete
+                            </button>
+                          </div>
+                        </CTableDataCell>
+                        {/* Add more table cells as needed */}
+                      </CTableRow>
+                    ))
+                  )}
                 </CTableBody>
               </CTable>
             </CCardBody>
