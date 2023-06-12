@@ -39,6 +39,7 @@ const Publishers = () => {
   const [email, setEmail] = useState('')
   const [company, setCompany] = useState('')
   const [phoneNo, setPhoneNo] = useState('')
+  const [showInfo, setShowInfo] = useState(false)
   const [show, setShow] = useState(false)
   const [formSubmitted, setFormSubmitted] = useState(false)
  
@@ -149,6 +150,24 @@ const Publishers = () => {
     setPhoneNo(phone_no)
     setEmail(email)
     setUpdating(true)
+    setUpdateId(userId)
+    setCompany(company)
+  }
+
+
+  const handleInfo = (event) => {
+    setShowInfo(!showInfo)
+   
+    const userId = event.target.id
+
+    const name = event.target.closest('.reporter-row').querySelector('.name').textContent
+    const phone_no = event.target.closest('.reporter-row').querySelector('.phone-no').textContent
+    const email = event.target.closest('.reporter-row').querySelector('.email').textContent
+    const company = event.target.closest('.reporter-row').querySelector('.company').textContent
+
+    setName(name)
+    setPhoneNo(phone_no)
+    setEmail(email)
     setUpdateId(userId)
     setCompany(company)
   }
@@ -277,9 +296,49 @@ const Publishers = () => {
           </form>
         </CModalBody>
       </CModal>
+
+      {/* Info Modal */}
+      <CModal visible={showInfo} onClose={() => setShowInfo(false)}>
+        <CModalHeader onClose={() => setShow(false)}></CModalHeader>
+        <CModalBody>
+          <div className="">
+            <div className="card">
+              <div className="card-body">
+                <center className="m-t-30">
+                 
+                  <img
+                    src={`https://xsgames.co/randomusers/assets/avatars/male/${updateId}.jpg`}
+                    className="img-circle rounded-circle"
+                    width={150}
+                  />
+                  <h4 className="card-title m-t-10">
+                    {name}
+                  </h4>
+                 
+                </center>
+              </div>
+              <div>
+                <hr />{' '}
+              </div>
+              <div className="card-body">
+               <small className="text-muted p-t-30 db">User Id:</small>
+                <h6>{updateId}</h6>
+                <small className="text-muted">Email address: </small>
+                <h6>{email}</h6> <small className="text-muted p-t-30 db">Company:</small>
+                <h6>{company}</h6> 
+                <h6>{email}</h6> <small className="text-muted p-t-30 db">Phone No:</small>
+                <h6>{phoneNo}</h6> 
+                
+              </div>
+            </div>
+          </div>
+        </CModalBody>
+      </CModal>
+
+
       {/* Header */}
       <div className="d-flex py-2 justify-content-between px-5">
-      <CButton type='danger' >Publishers <span className="badge badge-secondary bg-dark">{users ? count : '0'}</span> </CButton>
+      <CButton  >Publishers <span className="badge badge-secondary bg-primary ">{users ? count : '0'}</span> </CButton>
         {/* Search box */}
         <form className="d-flex flex-grow-1 mx-2" role="search">
           <input  onChange={(e)=>setSearchQuery(e.target.value)} value={searchQuery}  className="form-control me-2" type="search" placeholder="Search by first or Last Name" aria-label="Search" />
@@ -293,8 +352,6 @@ const Publishers = () => {
           <CCard className="mb-4">
             <CCardBody>
               <br />
-
-              
                   {users == null
                     ? 
                     <div className="spinner-border d-flex justify-content-center " role="status">
@@ -323,7 +380,7 @@ const Publishers = () => {
                           <CTableDataCell className="company">{user.company_name}</CTableDataCell>
                           <CTableDataCell>
                             <div className="d-flex gap-2">
-                              <button className="btn btn-dark">info</button>
+                              <button id={user.id} onClick={handleInfo} className="btn btn-dark">info</button>
                               <button id={user.id} onClick={handleEdit} className="btn btn-primary text-white">
                                 Edit
                               </button>

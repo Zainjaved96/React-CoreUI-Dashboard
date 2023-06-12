@@ -365,7 +365,9 @@ const Reporters = () => {
                 <CTableBody>
                   {/* Mapping over fetched data  */}
                   {users == null
-                    ? 'Loading'
+                    ? <div className="spinner-border d-flex justify-content-center " role="status">
+                        <span className="sr-only"></span>
+                      </div>
                     : users.map((user, index) => (
                         <CTableRow className="reporter-row" key={user.id}>
                           <CTableDataCell className="user-id">{user.id}</CTableDataCell>

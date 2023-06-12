@@ -296,7 +296,7 @@ const Reporters = () => {
                 <h3 className="card-title">{headline}</h3>
               </div>
               <div>
-                <hr />{' '}
+                <hr />
               </div>
               <div className="card-body">
                 <small className="text-muted p-t-30 db">Article Body</small>
@@ -352,7 +352,9 @@ const Reporters = () => {
                 </CTableHead>
                 <CTableBody>
                   {users == null
-                    ? 'Loading'
+                    ? <div className="spinner-border d-flex justify-content-center " role="status">
+                        <span className="sr-only"></span>
+                      </div>
                     : users.map((user, index) => (
                         <CTableRow className="article-row" key={user.id}>
                           <CTableDataCell className="user-id">{user.id}</CTableDataCell>
