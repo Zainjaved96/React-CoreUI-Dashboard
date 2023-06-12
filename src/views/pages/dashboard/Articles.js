@@ -54,7 +54,6 @@ const Reporters = () => {
   const handleShow = () => setShow(true)
 
   const fetchData = async (url) => {
-    console.log(searchQuery)
     try {
       if (searchQuery != ''){
         url = url + searchQuery
@@ -84,7 +83,6 @@ const Reporters = () => {
       
       const response = await axios.get('http://127.0.0.1:8000/blog_service/reporter/')
       setReporters(response.data.results)
-      console.log(reporters)
     } catch (error) {
       console.error('Error fetching data:', error)
     }
@@ -101,7 +99,7 @@ const Reporters = () => {
       details: details,
       reporter: reporterId,
       publisher: [
-        16
+        17, 12
       ],
     }
 
@@ -250,17 +248,8 @@ const Reporters = () => {
               <label htmlFor="lastName" className="form-label">
                Details
               </label>
-              <input
-                type="message"
-                className="form-control"
-                id="details"
-                value={details}
-                onChange={(e) => setDetails(e.target.value)}
-                required
-                placeholder="Write your article"
-              />
+              <textarea value={details}  onChange={(e)=>setDetails(e.target.value)} className="form-control" placeholder='Write Your Article here' id="exampleFormControlTextarea1" rows="3"></textarea>
             </div>
-            
             <div className="mb-3">
               <label htmlFor="lastName" className="form-label">
                Reporter ID

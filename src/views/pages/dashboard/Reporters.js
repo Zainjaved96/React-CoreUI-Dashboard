@@ -2,18 +2,14 @@ import React from 'react'
 import { useState, useEffect } from 'react'
 import axios from 'axios'
 import {
- 
   CModal,
   CModalHeader,
-  
   CButton,
   CModalTitle,
- 
   CModalBody,
   CCard,
   CCardBody,
   CCol,
-
   CRow,
   CTable,
   CTableBody,
@@ -22,8 +18,6 @@ import {
   CTableHeaderCell,
   CTableRow,
 } from '@coreui/react'
-
-
 
 const Reporters = () => {
   const [searchQuery, setSearchQuery] = useState('')
@@ -40,8 +34,8 @@ const Reporters = () => {
   const [email, setEmail] = useState('')
   const [company, setCompany] = useState('')
   const [show, setShow] = useState(false)
+  const [showInfo, setShowInfo] = useState(false)
   const [formSubmitted, setFormSubmitted] = useState(false)
- 
 
   //   Handling Modal
   const handleClose = () => setShow(false)
@@ -50,10 +44,10 @@ const Reporters = () => {
   const fetchData = async (url) => {
     console.log(searchQuery)
     try {
-      if (searchQuery != ''){
+      if (searchQuery != '') {
         url = url + searchQuery
       }
-      
+
       const response = await axios.get(url)
 
       setUsers(response.data.results.reverse())
@@ -86,7 +80,6 @@ const Reporters = () => {
 
     if (updating) {
       try {
-        
         await axios.put(`http://127.0.0.1:8000/blog_service/reporter/${updateId}`, newUser)
         fetchData(url)
         // Reset the form after successful submission
@@ -153,6 +146,21 @@ const Reporters = () => {
     setCompany(company)
   }
 
+  const handleInfo = (event) => {
+    setShowInfo(!showInfo)
+    // fetching data for info
+    const userId = event.target.id
+    const first_name = event.target.closest('.reporter-row').querySelector('.first-name').textContent
+    const last_name = event.target.closest('.reporter-row').querySelector('.last-name').textContent
+    const email = event.target.closest('.reporter-row').querySelector('.email').textContent
+    const company = event.target.closest('.reporter-row').querySelector('.company').textContent
+    setFirstName(first_name)
+    setCompany(company)
+    setUpdateId(userId)
+    setLastName(last_name)
+    setEmail(email)
+  }
+
   const handleNext = () => {
     if (next) {
       setUrl(next)
@@ -166,8 +174,6 @@ const Reporters = () => {
       fetchData(prev)
     }
   }
-
-  
 
   return (
     <>
@@ -207,6 +213,7 @@ const Reporters = () => {
       </div>
 
       {/* Modal */}
+      {/* Form Modal */}
       <CModal visible={show} onClose={() => setShow(false)}>
         <CModalHeader onClose={() => setShow(false)}>
           <CModalTitle>Reporter Form</CModalTitle>
@@ -277,13 +284,61 @@ const Reporters = () => {
           </form>
         </CModalBody>
       </CModal>
+
+      {/* Info Modal */}
+      <CModal visible={showInfo} onClose={() => setShowInfo(false)}>
+        <CModalHeader onClose={() => setShow(false)}></CModalHeader>
+        <CModalBody>
+          <div className="">
+            <div className="card">
+              <div className="card-body">
+                <center className="m-t-30">
+                  {/* {' '} */}
+                  <img
+                    src={`https://xsgames.co/randomusers/assets/avatars/male/${updateId}.jpg`}
+                    className="img-circle rounded-circle"
+                    width={150}
+                  />
+                  <h4 className="card-title m-t-10">
+                    {firstName} {lastName}
+                  </h4>
+                 
+                </center>
+              </div>
+              <div>
+                <hr />{' '}
+              </div>
+              <div className="card-body">
+               <small className="text-muted p-t-30 db">User Id</small>
+                <h6>{updateId}</h6>
+                <small className="text-muted">Email address </small>
+                <h6>{email}</h6> <small className="text-muted p-t-30 db">Company</small>
+                <h6>{company}</h6> 
+                
+              </div>
+            </div>
+          </div>
+        </CModalBody>
+      </CModal>
+
+      {/* Modals End */}
+
       {/* Header */}
       <div className="d-flex py-2 justify-content-between px-5 align-items-center">
-      <CButton type='danger' >Reporters <span className="badge badge-secondary bg-primary">{users ? count : '0'}</span></CButton>
-        
+        <CButton type="danger">
+          Reporters <span className="badge badge-secondary bg-primary">{users ? count : '0'}</span>
+        </CButton>
+
         {/* Search box */}
         <form className="d-flex flex-grow-1 mx-2" role="search">
-          <input  onChange={(e)=>setSearchQuery(e.target.value)} value={searchQuery}  className="form-control me-2" type="search" placeholder="Search by first or Last Name" aria-label="Search" />
+          <input
+            onChange={(e) => setSearchQuery(e.target.value)}
+            value={searchQuery}
+            className="form-control me-2"
+            type="search"
+            placeholder="Search by first or Last Name"
+            aria-label="Search"
+          />
         </form>
         <CButton onClick={() => setShow(!show)}>Add +</CButton>
       </div>
@@ -306,7 +361,9 @@ const Reporters = () => {
                     <CTableHeaderCell>Actions</CTableHeaderCell>
                   </CTableRow>
                 </CTableHead>
+                {/* Table body */}
                 <CTableBody>
+                  {/* Mapping over fetched data  */}
                   {users == null
                     ? 'Loading'
                     : users.map((user, index) => (
@@ -318,7 +375,9 @@ const Reporters = () => {
                           <CTableDataCell className="company">{user.company}</CTableDataCell>
                           <CTableDataCell>
                             <div className="d-flex gap-2">
-                              <button className="btn btn-dark">info</button>
+                              <button  id={user.id} onClick={handleInfo} className="btn btn-dark">
+                                info
+                              </button>
                               <button id={user.id} onClick={handleEdit} className="btn btn-primary text-white">
                                 Edit
                               </button>
