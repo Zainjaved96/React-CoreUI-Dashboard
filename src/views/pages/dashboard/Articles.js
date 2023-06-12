@@ -2,18 +2,14 @@ import React from 'react'
 import { useState, useEffect } from 'react'
 import axios from 'axios'
 import {
- 
   CModal,
   CModalHeader,
-  
   CButton,
   CModalTitle,
- 
   CModalBody,
   CCard,
   CCardBody,
   CCol,
-
   CRow,
   CTable,
   CTableBody,
@@ -22,8 +18,6 @@ import {
   CTableHeaderCell,
   CTableRow,
 } from '@coreui/react'
-
-
 
 const Reporters = () => {
   const [searchQuery, setSearchQuery] = useState('')
@@ -39,15 +33,17 @@ const Reporters = () => {
   const [details, setDetails] = useState('')
   const [date, setDate] = useState('')
 
-  const[reporterId, setReporterId] = useState(null)
+  const [reporterId, setReporterId] = useState(null)
+  const [reporterName, setReporterName] = useState('')
   const [reporters, setReporters] = useState([])
 
-  const [publishers, setPublishers]= useState([])
+  const [publishers, setPublishers] = useState([])
   const [selectedPublisher, setSelectedPublisher] = useState([])
-  
+
+  // Modal states
   const [show, setShow] = useState(false)
+  const [showInfo, setShowInfo] = useState(false)
   const [formSubmitted, setFormSubmitted] = useState(false)
- 
 
   //   Handling Modal
   const handleClose = () => setShow(false)
@@ -55,10 +51,10 @@ const Reporters = () => {
 
   const fetchData = async (url) => {
     try {
-      if (searchQuery != ''){
+      if (searchQuery != '') {
         url = url + searchQuery
       }
-      
+
       const response = await axios.get(url)
 
       setUsers(response.data.results.reverse())
@@ -74,13 +70,10 @@ const Reporters = () => {
   useEffect(() => {
     fetchData(url)
     fetchReporters()
-   
   }, [searchQuery])
 
-  const fetchReporters  = async () => {
-    
+  const fetchReporters = async () => {
     try {
-      
       const response = await axios.get('http://127.0.0.1:8000/blog_service/reporter/')
       setReporters(response.data.results)
     } catch (error) {
@@ -98,14 +91,11 @@ const Reporters = () => {
       headline: headline,
       details: details,
       reporter: reporterId,
-      publisher: [
-        17, 12
-      ],
+      publisher: [17, 12],
     }
 
     if (updating) {
       try {
-        
         await axios.put(`http://127.0.0.1:8000/blog_service/article/${updateId}`, newUser)
         fetchData(url)
         // Reset the form after successful submission
@@ -129,7 +119,6 @@ const Reporters = () => {
     setFormSubmitted(true)
     setHeadline('')
     setDetails('')
-
   }
 
   function showNoti(id) {
@@ -170,6 +159,24 @@ const Reporters = () => {
     // setCompany(company)
   }
 
+  const handleInfo = (event) => {
+    setShowInfo(!showInfo)
+    // fetching data for info
+    // Fetching data to store in the form
+    const userId = event.target.id
+
+    const headline = event.target.closest('.article-row').querySelector('.headline').textContent
+    const details = event.target.closest('.article-row').querySelector('.details').textContent
+    const reporter_id = event.target.closest('.article-row').querySelector('.reporter-id').textContent
+    const reporter_name = event.target.closest('.article-row').querySelector('.reporter-name').textContent
+
+    setHeadline(headline)
+    setDetails(details)
+    setUpdateId(userId)
+    setReporterId(reporter_id)
+    setReporterName(reporter_name)
+  }
+
   const handleNext = () => {
     if (next) {
       setUrl(next)
@@ -183,8 +190,6 @@ const Reporters = () => {
       fetchData(prev)
     }
   }
-
-  
 
   return (
     <>
@@ -224,6 +229,8 @@ const Reporters = () => {
       </div>
 
       {/* Modal */}
+
+      {/* Table Modal */}
       <CModal visible={show} onClose={() => setShow(false)}>
         <CModalHeader onClose={() => setShow(false)}>
           <CModalTitle>Article Submission</CModalTitle>
@@ -246,13 +253,20 @@ const Reporters = () => {
             </div>
             <div className="mb-3">
               <label htmlFor="lastName" className="form-label">
-               Details
+                Details
               </label>
-              <textarea value={details}  onChange={(e)=>setDetails(e.target.value)} className="form-control" placeholder='Write Your Article here' id="exampleFormControlTextarea1" rows="3"></textarea>
+              <textarea
+                value={details}
+                onChange={(e) => setDetails(e.target.value)}
+                className="form-control"
+                placeholder="Write Your Article here"
+                id="exampleFormControlTextarea1"
+                rows="3"
+              ></textarea>
             </div>
             <div className="mb-3">
               <label htmlFor="lastName" className="form-label">
-               Reporter ID
+                Reporter ID
               </label>
               <input
                 type="number"
@@ -270,13 +284,49 @@ const Reporters = () => {
           </form>
         </CModalBody>
       </CModal>
+
+      {/* Info Modal */}
+      {/* Info Modal */}
+      <CModal visible={showInfo} onClose={() => setShowInfo(false)}>
+        <CModalHeader onClose={() => setShow(false)}></CModalHeader>
+        <CModalBody>
+          <div className="">
+            <div className="card">
+              <div className="card-body p-2 m-0">
+                <h3 className="card-title">{headline}</h3>
+              </div>
+              <div>
+                <hr />{' '}
+              </div>
+              <div className="card-body">
+                <small className="text-muted p-t-30 db">Article Body</small>
+                <h6>{details}</h6>
+                <small className="text-muted p-t-30 db">Article Id</small>
+                <h6>{updateId}</h6>
+                <small className="text-muted">Reporter Name</small>
+                <h6>{reporterName}</h6>
+              </div>
+            </div>
+          </div>
+        </CModalBody>
+      </CModal>
+
       {/* Header */}
       <div className="d-flex py-2 justify-content-between px-5">
-      <CButton  >Articles<span className="badge badge-secondary bg-primary">{users ? count : '0'}</span> </CButton>
+        <CButton>
+          Articles<span className="badge badge-secondary bg-primary">{users ? count : '0'}</span>{' '}
+        </CButton>
 
         {/* Search box */}
         <form className="d-flex flex-grow-1 mx-2" role="search">
-          <input  onChange={(e)=>setSearchQuery(e.target.value)} value={searchQuery}  className="form-control me-2" type="search" placeholder="Search by first or Last Name" aria-label="Search" />
+          <input
+            onChange={(e) => setSearchQuery(e.target.value)}
+            value={searchQuery}
+            className="form-control me-2"
+            type="search"
+            placeholder="Search by first or Last Name"
+            aria-label="Search"
+          />
         </form>
         <CButton onClick={() => setShow(!show)}>Add +</CButton>
       </div>
@@ -307,13 +357,16 @@ const Reporters = () => {
                         <CTableRow className="article-row" key={user.id}>
                           <CTableDataCell className="user-id">{user.id}</CTableDataCell>
                           <CTableDataCell className="headline">{user.headline}</CTableDataCell>
-                          <CTableDataCell className="details">{user.details}</CTableDataCell>
-                          <CTableDataCell className="reporter-id">{user.reporter.id}</CTableDataCell>                          
-                          <CTableDataCell className="reporter-name">{user.reporter.first_name}</CTableDataCell>                          
-                          <CTableDataCell className="created">{user.created_at.substring(0,10)}</CTableDataCell>                        
+                          <CTableDataCell>{user.details.substring(0, 10)}</CTableDataCell>
+                          <CTableDataCell className="details d-none">{user.details}</CTableDataCell>
+                          <CTableDataCell className="reporter-id">{user.reporter.id}</CTableDataCell>
+                          <CTableDataCell className="reporter-name">{user.reporter.first_name}</CTableDataCell>
+                          <CTableDataCell className="created">{user.created_at.substring(0, 10)}</CTableDataCell>
                           <CTableDataCell>
                             <div className="d-flex gap-2">
-                              <button className="btn btn-dark">info</button>
+                              <button id={user.id} onClick={handleInfo} className="btn btn-dark">
+                                info
+                              </button>
                               <button id={user.id} onClick={handleEdit} className="btn btn-primary text-white">
                                 Edit
                               </button>

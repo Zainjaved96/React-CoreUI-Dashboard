@@ -56,7 +56,7 @@ const Reporters = () => {
       setPrev(response.data.previous)
       setIsLoading(false)
     } catch (error) {
-      console.error('Error fetching data:', error)
+      console.error('Error fetching data:', error)  
     }
   }
 
