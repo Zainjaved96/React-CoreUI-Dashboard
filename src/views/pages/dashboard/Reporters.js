@@ -117,8 +117,9 @@ const Reporters = () => {
     }, 2000)
   }
 
-  const handleDelete = async (event) => {
-    const userId = event.target.id
+  const handleDelete = async (id, event) => {
+    const userId = id
+    console.log(userId)
     try {
       const response = await axios.delete(`http://127.0.0.1:8000/blog_service/reporter/${userId}`)
       showNoti('deleteNotification')
@@ -130,10 +131,10 @@ const Reporters = () => {
     }
   }
 
-  const handleEdit = async (event) => {
+  const handleEdit = async (id, event) => {
     handleShow()
     // Fetching data to store in the form
-    const userId = event.target.id
+    const userId = id
 
     const first_name = event.target.closest('.reporter-row').querySelector('.first-name').textContent
     const last_name = event.target.closest('.reporter-row').querySelector('.last-name').textContent
@@ -148,10 +149,10 @@ const Reporters = () => {
     setCompany(company)
   }
 
-  const handleInfo = (event) => {
+  const handleInfo = (id,event) => {
     setShowInfo(!showInfo)
     // fetching data for info
-    const userId = event.target.id
+    const userId = id
     const first_name = event.target.closest('.reporter-row').querySelector('.first-name').textContent
     const last_name = event.target.closest('.reporter-row').querySelector('.last-name').textContent
     const email = event.target.closest('.reporter-row').querySelector('.email').textContent
@@ -379,14 +380,14 @@ const Reporters = () => {
                           <CTableDataCell className="company">{user.company}</CTableDataCell>
                           <CTableDataCell>
                           <div className="d-flex gap-2">
-                            <button id={user.id} onClick={handleInfo} className="btn btn-dark">
+                            <a id={user.id} onClick={(evt) => handleInfo(user.id,evt)} className="btn btn-dark">
                             <AiFillInfoCircle size={25}  style={{ color: 'white' }} />
-                            </button>
-                            <button id={user.id} onClick={handleEdit} className="btn btn-primary text-white">
+                            </a>
+                            <button id={user.id} onClick={(evt) => handleEdit(user.id,evt)} className="btn btn-primary text-white">
                               <AiTwotoneEdit size={25}  style={{ color: 'white' }} />
                             </button>
-                            <button id={user.id} className="btn btn-light text-white" onClick={handleDelete}>
-                            <AiFillDelete size={25}  style={{ color: 'red' }} />
+                            <button id={user.id} onClick={(evt) => handleDelete(user.id,evt)} className="btn btn-light text-white">
+                            <AiFillDelete  size={25}  style={{ color: 'red' }} />
                             </button>
                           </div>
                           </CTableDataCell>

@@ -132,8 +132,8 @@ const Publishers = () => {
     }, 2000)
   }
 
-  const handleDelete = async (event) => {
-    const userId = event.target.id
+  const handleDelete = async (id,event) => {
+    const userId = id
     try {
       const response = await axios.delete(`http://127.0.0.1:8000/blog_service/publisher/${userId}`)
       showNoti('deleteNotification')
@@ -145,10 +145,10 @@ const Publishers = () => {
     }
   }
 
-  const handleEdit = async (event) => {
+  const handleEdit = async (id,event) => {
     handleShow()
     // Fetching data to store in the form
-    const userId = event.target.id
+    const userId = id
 
     const name = event.target.closest('.reporter-row').querySelector('.name').textContent
     const phone_no = event.target.closest('.reporter-row').querySelector('.phone-no').textContent
@@ -164,10 +164,10 @@ const Publishers = () => {
   }
 
 
-  const handleInfo = (event) => {
+  const handleInfo = (id, event) => {
     setShowInfo(!showInfo)
    
-    const userId = event.target.id
+    const userId = id
 
     const name = event.target.closest('.reporter-row').querySelector('.name').textContent
     const phone_no = event.target.closest('.reporter-row').querySelector('.phone-no').textContent
@@ -392,14 +392,14 @@ const Publishers = () => {
                           <CTableDataCell className="company">{user.company_name}</CTableDataCell>
                           <CTableDataCell>
                           <div className="d-flex gap-2">
-                            <button id={user.id} onClick={handleInfo} className="btn btn-dark">
+                            <a id={user.id} onClick={(evt) => handleInfo(user.id,evt)} className="btn btn-dark">
                             <AiFillInfoCircle size={25}  style={{ color: 'white' }} />
-                            </button>
-                            <button id={user.id} onClick={handleEdit} className="btn btn-primary text-white">
+                            </a>
+                            <button id={user.id} onClick={(evt) => handleEdit(user.id,evt)} className="btn btn-primary text-white">
                               <AiTwotoneEdit size={25}  style={{ color: 'white' }} />
                             </button>
-                            <button id={user.id} className="btn btn-danger text-white" onClick={handleDelete}>
-                            <AiFillDelete size={25}  style={{ color: 'white' }} />
+                            <button id={user.id} onClick={(evt) => handleDelete(user.id,evt)} className="btn btn-light text-white">
+                            <AiFillDelete  size={25}  style={{ color: 'red' }} />
                             </button>
                           </div>
                           </CTableDataCell>
