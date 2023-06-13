@@ -143,45 +143,29 @@ const Reporters = () => {
     }
   }
 
-  const handleEdit = async (id, event) => {
+  const handleEdit = async (user) => {
     handleShow()
     // Fetching data to store in the form
-    const userId = id
+    const publisherIds = user ? user.publisher.map((pub)=>pub.id) : []
 
-    const headline = event.target.closest('.article-row').querySelector('.headline').textContent
-    const details = event.target.closest('.article-row').querySelector('.details').textContent
-    const reporter_id = event.target.closest('.article-row').querySelector('.reporter-id').textContent
-    const publisherIds = Array.from(
-      event.target.closest('.article-row').querySelectorAll('.pub-id'),
-      (element) => element.textContent,
-    )
-
-    setHeadline(headline)
-    setDetails(details)
+    setHeadline(user.headline)
+    setDetails(user.details)
     setUpdating(true)
-    setUpdateId(userId)
-    setReporterId(reporter_id)
+    setUpdateId(user.id)
+    setReporterId(user.reporter.id)
     setPublishers(publisherIds)
     // setCompany(company)
   }
 
-  const handleInfo = (id, event) => {
+  const handleInfo = (user) => {
     setShowInfo(!showInfo)
-    // fetching data for info
-    // Fetching data to store in the form
-    const userId = id
 
-    const headline = event.target.closest('.article-row').querySelector('.headline').textContent
-    const details = event.target.closest('.article-row').querySelector('.details').textContent
-    const reporter_id = event.target.closest('.article-row').querySelector('.reporter-id').textContent
-    const reporter_name = event.target.closest('.article-row').querySelector('.reporter-name').textContent
-    const publishers_name = event.target.closest('.article-row').querySelector('.publisher-name').textContent
-    setHeadline(headline)
-    setDetails(details)
-    setUpdateId(userId)
-    setReporterId(reporter_id)
-    setReporterName(reporter_name)
-    setPublisherNames(publishers_name)
+    setHeadline(user.headline)
+    setDetails(user.details)
+    setUpdateId(user.userId)
+    setReporterId(user.reporter.id)
+    setReporterName(user.reporter.first_name)
+    setPublisherNames(user.publisher)
   }
 
   const handleNext = () => {
@@ -362,7 +346,7 @@ const Reporters = () => {
                 <small className="text-muted">Reporter:</small>
                 <h6>{reporterName}</h6>
                 <small className="text-muted">Publishers:</small>
-                <h6>{publisherNames}</h6>
+                <h6>{publisherNames ? publisherNames.map((pub) => pub.name) : 'No Publisher Found'}</h6>
               </div>
             </div>
           </div>
@@ -441,10 +425,10 @@ const Reporters = () => {
                         <CTableDataCell className="created">{user.created_at.substring(0, 10)}</CTableDataCell>
                         <CTableDataCell>
                         <div className="d-flex gap-2">
-                            <a id={user.id} onClick={(evt) => handleInfo(user.id,evt)} className="btn btn-dark">
+                            <a id={user.id} onClick={() => handleInfo(user)} className="btn btn-dark">
                             <AiFillInfoCircle size={25}  style={{ color: 'white' }} />
                             </a>
-                            <button id={user.id} onClick={(evt) => handleEdit(user.id,evt)} className="btn btn-primary text-white">
+                            <button id={user.id} onClick={() => handleEdit(user)} className="btn btn-primary text-white">
                               <AiTwotoneEdit size={25}  style={{ color: 'white' }} />
                             </button>
                             <button id={user.id} onClick={(evt) => handleDelete(user.id,evt)} className="btn btn-light text-white">
