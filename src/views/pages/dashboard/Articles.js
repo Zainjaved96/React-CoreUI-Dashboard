@@ -41,7 +41,7 @@ const Reporters = () => {
   const [reporterName, setReporterName] = useState('')
   const [reporters, setReporters] = useState([])
 
-  const [publishers, setPublishers] = useState([0])
+  const [publishers, setPublishers] = useState([])
   const [publisherNames, setPublisherNames] = useState('')
 
   // Modal states
@@ -205,7 +205,7 @@ const Reporters = () => {
   }
 
   const handleAddInput = () => {
-    setPublishers([...publishers, 0]) // Add an empty input to the state
+    setPublishers([...publishers, null]) // Add an empty input to the state
   }
 
   const handleRemoveInput = (index) => {
