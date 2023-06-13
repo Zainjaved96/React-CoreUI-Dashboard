@@ -1,6 +1,9 @@
 import React from 'react'
 import { useState, useEffect } from 'react'
 import axios from 'axios'
+import Button from 'react-bootstrap/Button';
+import Modal from 'react-bootstrap/Modal';
+import { AiFillDelete, AiTwotoneEdit,AiFillInfoCircle } from "react-icons/ai";
 import {
   CModal,
   CModalHeader,
@@ -18,7 +21,8 @@ import {
   CTableHeaderCell,
   CTableRow,
 } from '@coreui/react'
-
+import CIcon from '@coreui/icons-react'
+import * as icon from '@coreui/icons'
 const Reporters = () => {
   const [searchQuery, setSearchQuery] = useState('')
   const [url, setUrl] = useState(`http://127.0.0.1:8000/blog_service/article/?search_key=`)
@@ -37,8 +41,8 @@ const Reporters = () => {
   const [reporterName, setReporterName] = useState('')
   const [reporters, setReporters] = useState([])
 
-  const [publishers, setPublishers] = useState()
-  const [selectedPublisher, setSelectedPublisher] = useState([])
+  const [publishers, setPublishers] = useState([0])
+  const [publisherNames, setPublisherNames] = useState('')
 
   // Modal states
   const [show, setShow] = useState(false)
@@ -46,12 +50,12 @@ const Reporters = () => {
   const [formSubmitted, setFormSubmitted] = useState(false)
 
   //   Handling Modal
-  const handleClose = () =>{ 
+  const handleClose = () => {
     setShow(false)
     setHeadline('')
     setDetails('')
     setReporterId('')
-    setSelectedPublisher([])
+   
   }
 
   const handleShow = () => setShow(true)
@@ -87,7 +91,7 @@ const Reporters = () => {
       headline: headline,
       details: details,
       reporter: reporterId,
-      publisher: selectedPublisher,
+      publisher: publishers,
     }
 
     if (updating) {
@@ -147,14 +151,17 @@ const Reporters = () => {
     const headline = event.target.closest('.article-row').querySelector('.headline').textContent
     const details = event.target.closest('.article-row').querySelector('.details').textContent
     const reporter_id = event.target.closest('.article-row').querySelector('.reporter-id').textContent
-    const publisherIds = Array.from(event.target.closest('.article-row').querySelectorAll('.pub-id'), (element) => element.textContent);
+    const publisherIds = Array.from(
+      event.target.closest('.article-row').querySelectorAll('.pub-id'),
+      (element) => element.textContent,
+    )
 
     setHeadline(headline)
     setDetails(details)
     setUpdating(true)
     setUpdateId(userId)
     setReporterId(reporter_id)
-    setSelectedPublisher(publisherIds)
+    setPublishers(publisherIds)
     // setCompany(company)
   }
 
@@ -174,7 +181,7 @@ const Reporters = () => {
     setUpdateId(userId)
     setReporterId(reporter_id)
     setReporterName(reporter_name)
-    setPublishers(publishers_name)
+    setPublisherNames(publishers_name)
   }
 
   const handleNext = () => {
@@ -191,14 +198,38 @@ const Reporters = () => {
     }
   }
 
+  const handleInputChange = (index, event) => {
+    const updatedPublishers = [...publishers]
+    updatedPublishers[index] = event.target.value
+    setPublishers(updatedPublishers)
+  }
 
-  const handlePublisherChange = (event) => {
-    const selectedOptions = Array.from(event.target.selectedOptions, (option) =>
-      option.value
-    );
-    setSelectedPublisher(selectedOptions);
-  };
+  const handleAddInput = () => {
+    setPublishers([...publishers, 0]) // Add an empty input to the state
+  }
 
+  const handleRemoveInput = (index) => {
+    const updatedPublishers = [...publishers]
+    updatedPublishers.splice(index, 1) // Remove input at the given index
+    setPublishers(updatedPublishers)
+  }
+
+  const renderPublisherInputs = () => {
+    return publishers.map((publisher, index) => (
+      <div className=" d-flex py-2  gap-2 justify-content-between" key={index}>
+        <input
+          type="number"
+          className="form-control"
+          value={publisher}
+          onChange={(event) => handleInputChange(index, event)}
+        />
+        <a className="btn btn-danger " onClick={() => handleRemoveInput(index)}>
+         <AiFillDelete  style={{ color: 'white' }} />
+
+        </a>
+      </div>
+    ))
+  }
 
   return (
     <>
@@ -240,11 +271,11 @@ const Reporters = () => {
       {/* Modal */}
 
       {/* Table Modal */}
-      <CModal visible={show} onClose={handleClose}>
-        <CModalHeader onClose={handleClose}>
-          <CModalTitle>Article Submission</CModalTitle>
-        </CModalHeader>
-        <CModalBody>
+      <Modal  show={show} onHide={handleClose}>
+        <Modal.Header  onHide={handleClose}>
+          <Modal.Title>Article Submission</Modal.Title>
+        </Modal.Header>
+        <Modal.Body>
           <form className="col-lg-8 mx-auto needs-validation" onSubmit={handleSubmit}>
             <div className="mb-3">
               <label htmlFor="headline" className="form-label">
@@ -288,23 +319,29 @@ const Reporters = () => {
               />
             </div>
             <div className="mb-3">
-              <select className='form-control' name="publisher" multiple value={selectedPublisher} onChange={handlePublisherChange}>
-                {Array.from({ length: 100 }, (_, index) => (
-                  <option key={index + 1} value={index + 1}>
-                    Publisher {index + 1}
-                  </option>
-                ))}
-              </select>
+              <label htmlFor="lastName" className="form-label">
+                Publisher ID
+              </label>
+              {renderPublisherInputs()}
+              <div>
+              <a className="btn btn-primary " onClick={handleAddInput}>
+                <CIcon icon={icon.cilPlus} size="md" />
+              </a>
+              </div>
+              
             </div>
 
             <button type="submit" className="btn btn-lg btn-success text-white">
               Submit
             </button>
           </form>
-        </CModalBody>
-      </CModal>
+        </Modal.Body>
+      </Modal>
+
+      
 
      
+
       {/* Info Modal */}
       <CModal visible={showInfo} onClose={() => setShowInfo(false)}>
         <CModalHeader onClose={() => setShow(false)}></CModalHeader>
@@ -325,7 +362,7 @@ const Reporters = () => {
                 <small className="text-muted">Reporter:</small>
                 <h6>{reporterName}</h6>
                 <small className="text-muted">Publishers:</small>
-                <h6>{publishers}</h6>
+                <h6>{publisherNames}</h6>
               </div>
             </div>
           </div>
@@ -365,11 +402,10 @@ const Reporters = () => {
                     <CTableHeaderCell>id</CTableHeaderCell>
                     <CTableHeaderCell>Headline</CTableHeaderCell>
                     <CTableHeaderCell>Description</CTableHeaderCell>
-                    <CTableHeaderCell className='d-none'>Reporter id</CTableHeaderCell>
+                    <CTableHeaderCell className="d-none">Reporter id</CTableHeaderCell>
                     <CTableHeaderCell>Written by </CTableHeaderCell>
                     <CTableHeaderCell>Published by </CTableHeaderCell>
-                    <CTableHeaderCell className='d-none'>Publishers id</CTableHeaderCell>
-
+                    <CTableHeaderCell className="d-none">Publishers id</CTableHeaderCell>
                     <CTableHeaderCell>Created at</CTableHeaderCell>
                     <CTableHeaderCell>Actions</CTableHeaderCell>
                   </CTableRow>
@@ -389,24 +425,30 @@ const Reporters = () => {
                         <CTableDataCell className="reporter-id d-none">{user.reporter.id}</CTableDataCell>
                         <CTableDataCell className="reporter-name">{user.reporter.first_name}</CTableDataCell>
                         <CTableDataCell className="publisher-name">
-                          <div className='d-flex flex-column '>
-                          {  user.publisher.map((pub) => <div key={pub.id}>{`${pub.name} `}</div>)}
+                          <div className="d-flex flex-column ">
+                            {user.publisher.map((pub) => (
+                              <div key={pub.id}>{`${pub.name} `}</div>
+                            ))}
                           </div>
-                          </CTableDataCell>
-                        <CTableDataCell className="publisher-id d-none ">{user.publisher.map((pub, index) =>
-                         <div key={pub.id} className='pub-id'>{pub.id}</div>
-                         )}</CTableDataCell>
+                        </CTableDataCell>
+                        <CTableDataCell className="publisher-id d-none ">
+                          {user.publisher.map((pub, index) => (
+                            <div key={pub.id} className="pub-id">
+                              {pub.id}
+                            </div>
+                          ))}
+                        </CTableDataCell>
                         <CTableDataCell className="created">{user.created_at.substring(0, 10)}</CTableDataCell>
                         <CTableDataCell>
                           <div className="d-flex gap-2">
                             <button id={user.id} onClick={handleInfo} className="btn btn-dark">
-                              info
+                            <AiFillInfoCircle size={25}  style={{ color: 'white' }} />
                             </button>
                             <button id={user.id} onClick={handleEdit} className="btn btn-primary text-white">
-                              Edit
+                              <AiTwotoneEdit size={25}  style={{ color: 'white' }} />
                             </button>
                             <button id={user.id} className="btn btn-danger text-white" onClick={handleDelete}>
-                              Delete
+                            <AiFillDelete size={25}  style={{ color: 'white' }} />
                             </button>
                           </div>
                         </CTableDataCell>

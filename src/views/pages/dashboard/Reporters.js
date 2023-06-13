@@ -1,6 +1,8 @@
 import React from 'react'
 import { useState, useEffect } from 'react'
 import axios from 'axios'
+import { AiFillDelete, AiTwotoneEdit,AiFillInfoCircle } from "react-icons/ai";
+
 import {
   CModal,
   CModalHeader,
@@ -376,17 +378,17 @@ const Reporters = () => {
                           <CTableDataCell className="email">{user.email}</CTableDataCell>
                           <CTableDataCell className="company">{user.company}</CTableDataCell>
                           <CTableDataCell>
-                            <div className="d-flex gap-2">
-                              <button  id={user.id} onClick={handleInfo} className="btn btn-dark">
-                                info
-                              </button>
-                              <button id={user.id} onClick={handleEdit} className="btn btn-primary text-white">
-                                Edit
-                              </button>
-                              <button id={user.id} className="btn btn-danger text-white" onClick={handleDelete}>
-                                Delete
-                              </button>
-                            </div>
+                          <div className="d-flex gap-2">
+                            <button id={user.id} onClick={handleInfo} className="btn btn-dark">
+                            <AiFillInfoCircle size={25}  style={{ color: 'white' }} />
+                            </button>
+                            <button id={user.id} onClick={handleEdit} className="btn btn-primary text-white">
+                              <AiTwotoneEdit size={25}  style={{ color: 'white' }} />
+                            </button>
+                            <button id={user.id} className="btn btn-light text-white" onClick={handleDelete}>
+                            <AiFillDelete size={25}  style={{ color: 'red' }} />
+                            </button>
+                          </div>
                           </CTableDataCell>
                           {/* Add more table cells as needed */}
                         </CTableRow>
