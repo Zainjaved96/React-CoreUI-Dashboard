@@ -1,9 +1,9 @@
 import React from 'react'
 import { useState, useEffect } from 'react'
 import axios from 'axios'
-import Button from 'react-bootstrap/Button';
-import Modal from 'react-bootstrap/Modal';
-import { AiFillDelete, AiTwotoneEdit,AiFillInfoCircle } from "react-icons/ai";
+import Button from 'react-bootstrap/Button'
+import Modal from 'react-bootstrap/Modal'
+import { AiFillDelete, AiTwotoneEdit, AiFillInfoCircle } from 'react-icons/ai'
 import {
   CModal,
   CModalHeader,
@@ -39,7 +39,9 @@ const Reporters = () => {
 
   const [reporterId, setReporterId] = useState(null)
   const [reporterName, setReporterName] = useState('')
-  const [reporters, setReporters] = useState([])
+
+  const [availableReporters, setAvailableReporters] = useState([])
+ 
 
   const [publishers, setPublishers] = useState([])
   const [publisherNames, setPublisherNames] = useState('')
@@ -55,7 +57,6 @@ const Reporters = () => {
     setHeadline('')
     setDetails('')
     setReporterId('')
-   
   }
 
   const handleShow = () => setShow(true)
@@ -68,13 +69,17 @@ const Reporters = () => {
       }
 
       const response = await axios.get(url)
-
+      const available_reporters = await axios.get('http://127.0.0.1:8000/blog_service/reporter/')
+      console.log(available_reporters)
+      setAvailableReporters(available_reporters.data.results)
+      console.log(availableReporters)
       setUsers(response.data.results.reverse())
       setCount(response.data.count)
       setNext(response.data.next)
       setPrev(response.data.previous)
       setIsLoading(false)
     } catch (error) {
+    
       console.error('Error fetching data:', error)
     }
   }
@@ -146,7 +151,7 @@ const Reporters = () => {
   const handleEdit = async (user) => {
     handleShow()
     // Fetching data to store in the form
-    const publisherIds = user ? user.publisher.map((pub)=>pub.id) : []
+    const publisherIds = user ? user.publisher.map((pub) => pub.id) : []
 
     setHeadline(user.headline)
     setDetails(user.details)
@@ -208,8 +213,7 @@ const Reporters = () => {
           onChange={(event) => handleInputChange(index, event)}
         />
         <a className="btn btn-danger " onClick={() => handleRemoveInput(index)}>
-         <AiFillDelete  style={{ color: 'white' }} />
-
+          <AiFillDelete style={{ color: 'white' }} />
         </a>
       </div>
     ))
@@ -255,8 +259,8 @@ const Reporters = () => {
       {/* Modal */}
 
       {/* Table Modal */}
-      <Modal  show={show} onHide={handleClose}>
-        <Modal.Header  onHide={handleClose}>
+      <Modal show={show} onHide={handleClose}>
+        <Modal.Header onHide={handleClose}>
           <Modal.Title>Article Submission</Modal.Title>
         </Modal.Header>
         <Modal.Body>
@@ -290,17 +294,14 @@ const Reporters = () => {
             </div>
             <div className="mb-3">
               <label htmlFor="lastName" className="form-label">
-                Reporter ID
+                Reporter 
               </label>
-              <input
-                type="number"
-                className="form-control"
-                id="reporter"
-                value={reporterId}
-                onChange={(e) => setReporterId(e.target.value)}
-                required
-                placeholder="1"
-              />
+              <select  value={reporterId} onChange={ (e) => setReporterId(e.target.value)} className="form-select" aria-label="Default select example">
+                {availableReporters ?  availableReporters.map((reporter,index)=>{
+                 return <option key={index} value={reporter.id}>{reporter.first_name}</option>
+                }): 'No reporters'}
+              </select>
+             
             </div>
             <div className="mb-3">
               <label htmlFor="lastName" className="form-label">
@@ -308,11 +309,10 @@ const Reporters = () => {
               </label>
               {renderPublisherInputs()}
               <div>
-              <a className="btn btn-primary " onClick={handleAddInput}>
-                <CIcon icon={icon.cilPlus} size="md" />
-              </a>
+                <a className="btn btn-primary " onClick={handleAddInput}>
+                  <CIcon icon={icon.cilPlus} size="md" />
+                </a>
               </div>
-              
             </div>
 
             <button type="submit" className="btn btn-lg btn-success text-white">
@@ -321,10 +321,6 @@ const Reporters = () => {
           </form>
         </Modal.Body>
       </Modal>
-
-      
-
-     
 
       {/* Info Modal */}
       <CModal visible={showInfo} onClose={() => setShowInfo(false)}>
@@ -424,15 +420,23 @@ const Reporters = () => {
                         </CTableDataCell>
                         <CTableDataCell className="created">{user.created_at.substring(0, 10)}</CTableDataCell>
                         <CTableDataCell>
-                        <div className="d-flex gap-2">
+                          <div className="d-flex gap-2">
                             <a id={user.id} onClick={() => handleInfo(user)} className="btn btn-dark">
-                            <AiFillInfoCircle size={25}  style={{ color: 'white' }} />
+                              <AiFillInfoCircle size={25} style={{ color: 'white' }} />
                             </a>
-                            <button id={user.id} onClick={() => handleEdit(user)} className="btn btn-primary text-white">
-                              <AiTwotoneEdit size={25}  style={{ color: 'white' }} />
+                            <button
+                              id={user.id}
+                              onClick={() => handleEdit(user)}
+                              className="btn btn-primary text-white"
+                            >
+                              <AiTwotoneEdit size={25} style={{ color: 'white' }} />
                             </button>
-                            <button id={user.id} onClick={(evt) => handleDelete(user.id,evt)} className="btn btn-light text-white">
-                            <AiFillDelete  size={25}  style={{ color: 'red' }} />
+                            <button
+                              id={user.id}
+                              onClick={(evt) => handleDelete(user.id, evt)}
+                              className="btn btn-light text-white"
+                            >
+                              <AiFillDelete size={25} style={{ color: 'red' }} />
                             </button>
                           </div>
                         </CTableDataCell>
