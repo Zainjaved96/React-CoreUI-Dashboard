@@ -55,6 +55,16 @@ const Publishers = () => {
     setCompany('')
     setPhoneNo('')
   }
+
+
+  const handleInfoClose = () => {
+    setShowInfo(false)
+    setName('')
+    setEmail('')
+    setCompany('')
+    setUpdateId(null)
+    setPhoneNo(null)
+  }
   const handleShow = () => setShow(true)
 
   const fetchData = async (url) => {
@@ -307,8 +317,8 @@ const Publishers = () => {
       </CModal>
 
       {/* Info Modal */}
-      <CModal visible={showInfo} onClose={() => setShowInfo(false)}>
-        <CModalHeader onClose={() => setShow(false)}></CModalHeader>
+      <CModal visible={showInfo} onClose={handleInfoClose}>
+        <CModalHeader onClose={handleInfoClose}></CModalHeader>
         <CModalBody>
           <div className="">
             <div className="card">

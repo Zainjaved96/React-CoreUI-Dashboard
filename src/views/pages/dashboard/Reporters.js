@@ -29,7 +29,7 @@ const Reporters = () => {
   const [prev, setPrev] = useState(null)
   const [isLoading, setIsLoading] = useState(true)
   const [updating, setUpdating] = useState(false)
-  const [updateId, setUpdateId] = useState(false)
+  const [updateId, setUpdateId] = useState(null)
   const [users, setUsers] = useState(null)
   const [firstName, setFirstName] = useState('')
   const [lastName, setLastName] = useState('')
@@ -42,6 +42,16 @@ const Reporters = () => {
   //   Handling Modal
   const handleClose = () => setShow(false)
   const handleShow = () => setShow(true)
+
+
+  const handleInfoClose = () => {
+    setShowInfo(false)
+    setFirstName('')
+    setLastName('')
+    setEmail('')
+    setCompany('')
+    setUpdateId(null)
+  }
 
   const fetchData = async (url) => {
     console.log(searchQuery)
@@ -289,8 +299,8 @@ const Reporters = () => {
       </CModal>
 
       {/* Info Modal */}
-      <CModal visible={showInfo} onClose={() => setShowInfo(false)}>
-        <CModalHeader onClose={() => setShow(false)}></CModalHeader>
+      <CModal visible={showInfo} onClose={handleInfoClose}>
+        <CModalHeader onClose={handleInfoClose}></CModalHeader>
         <CModalBody>
           <div className="">
             <div className="card">

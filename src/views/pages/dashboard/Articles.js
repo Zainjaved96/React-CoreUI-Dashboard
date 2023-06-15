@@ -59,6 +59,14 @@ const Reporters = () => {
     setReporterId('')
   }
 
+  const handleInfoClose = () => {
+    setShowInfo(false)
+    setHeadline('')
+    setDetails('')
+    setReporterId('')
+    setPublishers([])
+  }
+
   const handleShow = () => setShow(true)
 
   // Fetching articles data
@@ -167,7 +175,7 @@ const Reporters = () => {
 
     setHeadline(user.headline)
     setDetails(user.details)
-    setUpdateId(user.userId)
+    setUpdateId(user.id)
     setReporterId(user.reporter.id)
     setReporterName(user.reporter.first_name)
     setPublisherNames(user.publisher)
@@ -323,8 +331,8 @@ const Reporters = () => {
       </Modal>
 
       {/* Info Modal */}
-      <CModal visible={showInfo} onClose={() => setShowInfo(false)}>
-        <CModalHeader onClose={() => setShow(false)}></CModalHeader>
+      <CModal visible={showInfo} onClose={handleInfoClose}>
+        <CModalHeader onClose={handleInfoClose}></CModalHeader>
         <CModalBody>
           <div className="">
             <div className="card">
