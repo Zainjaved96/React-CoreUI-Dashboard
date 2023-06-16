@@ -20,8 +20,13 @@ import {
   CTableHeaderCell,
   CTableRow,
 } from '@coreui/react'
+import { useAuthContext } from 'src/context/AuthContext';
+
 
 const Reporters = () => {
+
+  const { isAuth , logout } = useAuthContext();
+
   const [searchQuery, setSearchQuery] = useState('')
   const [url, setUrl] = useState(`http://127.0.0.1:8000/blog_service/reporter/?search_key=`)
   const [count, setCount] = useState(0)
@@ -43,6 +48,7 @@ const Reporters = () => {
   const handleClose = () => setShow(false)
   const handleShow = () => setShow(true)
 
+ 
 
   const handleInfoClose = () => {
     setShowInfo(false)

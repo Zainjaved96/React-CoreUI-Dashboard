@@ -50,15 +50,15 @@ const Modals = React.lazy(() => import('./views/notifications/modals/Modals'))
 const Toasts = React.lazy(() => import('./views/notifications/toasts/Toasts'))
 const Widgets = React.lazy(() => import('./views/widgets/Widgets'))
 
-// Pages
+// Pages 
 
-const Reporters = React.lazy(()=>import('./views/pages/dashboard/Reporters'))
+const Reporters = React.lazy(()=>import('./views/pages/dashboard/Articles'))
 const Articles = React.lazy(()=>import('./views/pages/dashboard/Articles'))
 const Publishers = React.lazy(()=>import('./views/pages/dashboard/Publishers'))
-const LoginForm  = React.lazy(()=>import('./components/forms/LoginForm'))
+
 const routes = [
  
-  { path: '/reporters', name: 'Reporters', element: Reporters },
+  { path: 'reporters', name: 'Reporters', element: Reporters },
   { path: '/articles', name: 'Articles', element: Articles },
   { path: '/publishers', name: 'Publishers', element: Publishers },
 

@@ -10,6 +10,7 @@ import {
   CHeaderToggler,
   CNavLink,
   CNavItem,
+  CButton
 } from '@coreui/react'
 import CIcon from '@coreui/icons-react'
 import { cilBell, cilEnvelopeOpen, cilList, cilMenu } from '@coreui/icons'
@@ -17,10 +18,27 @@ import { cilBell, cilEnvelopeOpen, cilList, cilMenu } from '@coreui/icons'
 import { AppBreadcrumb } from './index'
 import { AppHeaderDropdown } from './header/index'
 import { logo } from 'src/assets/brand/logo'
+import { useAuthContext } from 'src/context/AuthContext'
+import { useNavigate } from 'react-router-dom'
 
 const AppHeader = () => {
+
+  const navigate = useNavigate()
   const dispatch = useDispatch()
   const sidebarShow = useSelector((state) => state.sidebarShow)
+  const {isAuth, logout} = useAuthContext()
+
+  const handleLogout = () =>{
+    console.log("🚀 ~ file: AppHeader.js:34 ~ handleLogout ~ isAuth:", isAuth)
+
+    if(isAuth){
+      logout()
+      console.log("🚀 ~ file: AppHeader.js:34 ~ handleLogout ~ isAuth:", isAuth)
+      navigate('/login')
+
+    }
+  }
+
 
   return (
     <CHeader position="sticky" className="mb-4">
@@ -41,10 +59,7 @@ const AppHeader = () => {
             </CNavLink>
           </CNavItem>
           <CNavItem>
-            <CNavLink href="#">Users</CNavLink>
-          </CNavItem>
-          <CNavItem>
-            <CNavLink href="#">Settings</CNavLink>
+            <CButton onClick={handleLogout} >Logout</CButton>
           </CNavItem>
         </CHeaderNav>
         <CHeaderNav>

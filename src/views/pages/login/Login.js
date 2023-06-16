@@ -18,13 +18,13 @@ import { cilLockLocked, cilUser } from '@coreui/icons'
 import { useState } from 'react'
 import axios from 'axios'
 import { useNavigate } from 'react-router-dom';
-
+import { useAuthContext } from 'src/context/AuthContext'
 
 const Login = () => {
 const navigate = useNavigate(); 
 const [username, setUsername] = useState('')
 const [password, setPassword] = useState('')
-
+const {isAuth,login} = useAuthContext()  
 
 const handleLogin = async(e)=>{
 
@@ -32,13 +32,16 @@ const handleLogin = async(e)=>{
   try {
     const response = await axios.post('http://127.0.0.1:8000/auth/jwt/create/', {
       username,
-      password,
+      password, 
     });
-   
+
+    login()
+    console.log("🚀 ~ file: Login.js:28 ~ Login ~ isAuth:", isAuth)
+
     // Store the access token and refresh token in localStorage
     localStorage.setItem('accessToken', response.data.access);
     localStorage.setItem('refreshToken', response.data.refresh);
-    navigate('/reporters')  
+    navigate('/main/reporters')  
     console.log(response)
     
     // Redirect or perform other actions upon successful login

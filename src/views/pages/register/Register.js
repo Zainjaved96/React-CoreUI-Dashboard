@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { useState } from 'react'
 import {
   CButton,
   CCard,
@@ -14,7 +14,34 @@ import {
 import CIcon from '@coreui/icons-react'
 import { cilLockLocked, cilUser } from '@coreui/icons'
 
+import axios from 'axios'
+
 const Register = () => {
+  const [username, setUsername] = useState('')
+  const [password, setPassword] = useState('')
+  const [email, setEmail ] = useState('')
+
+  const handleRegister = async(e)=>{
+    e.preventDefault();
+    const payload =
+      {
+        "email": email,
+        "username": username,
+        "password": password
+      }
+    try {
+      const response = await axios.post('http://127.0.0.1:8000/auth/users/', payload)
+      console.log("🚀 ~ file: Register.js:37 ~ handleRegister ~ response:", response)
+
+    }
+
+    catch(error){
+      console.error("🚀 ~ file: Register.js:39 ~ handleRegister ~ error:", error)
+    }
+    
+
+
+  }
   return (
     <div className="bg-light min-vh-100 d-flex flex-row align-items-center">
       <CContainer>
@@ -22,41 +49,33 @@ const Register = () => {
           <CCol md={9} lg={7} xl={6}>
             <CCard className="mx-4">
               <CCardBody className="p-4">
-                <CForm>
+                <CForm onSubmit={handleRegister}>
                   <h1>Register</h1>
                   <p className="text-medium-emphasis">Create your account</p>
                   <CInputGroup className="mb-3">
                     <CInputGroupText>
                       <CIcon icon={cilUser} />
                     </CInputGroupText>
-                    <CFormInput placeholder="Username" autoComplete="username" />
+                    <CFormInput value={username} onChange={(e)=>setUsername(e.target.value)} placeholder="Username" autoComplete="username" />
                   </CInputGroup>
                   <CInputGroup className="mb-3">
                     <CInputGroupText>@</CInputGroupText>
-                    <CFormInput placeholder="Email" autoComplete="email" />
+                    <CFormInput value={email} onChange={(e)=>setEmail(e.target.value)} placeholder="Email" autoComplete="email" />
                   </CInputGroup>
                   <CInputGroup className="mb-3">
                     <CInputGroupText>
                       <CIcon icon={cilLockLocked} />
                     </CInputGroupText>
                     <CFormInput
+                     value={password} onChange={(e)=>setPassword(e.target.value)}
                       type="password"
                       placeholder="Password"
                       autoComplete="new-password"
                     />
                   </CInputGroup>
-                  <CInputGroup className="mb-4">
-                    <CInputGroupText>
-                      <CIcon icon={cilLockLocked} />
-                    </CInputGroupText>
-                    <CFormInput
-                      type="password"
-                      placeholder="Repeat password"
-                      autoComplete="new-password"
-                    />
-                  </CInputGroup>
+                 
                   <div className="d-grid">
-                    <CButton color="success">Create Account</CButton>
+                    <CButton color="success" type='submit'>Create Account</CButton>
                   </div>
                 </CForm>
               </CCardBody>
