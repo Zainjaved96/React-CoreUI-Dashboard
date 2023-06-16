@@ -59,8 +59,16 @@ const Reporters = () => {
       if (searchQuery != '') {
         url = url + searchQuery
       }
-
-      const response = await axios.get(url)
+      const accessToken = localStorage.getItem('accessToken');
+      console.log("🚀 ~ file: Reporters.js:63 ~ fetchData ~ accessToken:", accessToken)
+      
+      // Set the headers with the access token for authentication
+      const config = {
+        headers: {
+          Authorization: `JWT ${accessToken}`,
+        },
+      };
+      const response = await axios.get(url, config)
 
       setUsers(response.data.results.reverse())
       setCount(response.data.count)

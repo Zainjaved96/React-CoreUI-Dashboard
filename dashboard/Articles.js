@@ -77,7 +77,16 @@ const Reporters = () => {
       }
 
       const response = await axios.get(url)
-      const available_reporters = await axios.get('http://127.0.0.1:8000/blog_service/reporter/')
+      const accessToken = localStorage.getItem('accessToken');
+      console.log("🚀 ~ file: Reporters.js:63 ~ fetchData ~ accessToken:", accessToken)
+      
+      // Set the headers with the access token for authentication
+      const config = {
+        headers: {
+          Authorization: `JWT ${accessToken}`,
+        },
+      };
+      const available_reporters = await axios.get('http://127.0.0.1:8000/blog_service/reporter/',config)
       console.log(available_reporters)
       setAvailableReporters(available_reporters.data.results)
       console.log(availableReporters)
