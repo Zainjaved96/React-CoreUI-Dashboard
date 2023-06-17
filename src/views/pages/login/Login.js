@@ -21,12 +21,18 @@ import { useNavigate } from 'react-router-dom';
 import { useAuthContext } from 'src/context/AuthContext'
 
 const Login = () => {
-const navigate = useNavigate(); 
-const [username, setUsername] = useState('')
-const [password, setPassword] = useState('')
-const {isAuth,login} = useAuthContext()  
 
-const handleLogin = async(e)=>{
+  const navigate = useNavigate(); 
+  const [username, setUsername] = useState('')
+  const [password, setPassword] = useState('')
+  const {isAuth,login} = useAuthContext()  
+
+  // Errors
+  const [loginError , setLoginError] = useState(null)
+  const [userError, setUserError] = useState(null)
+  const [passError, setPassError] = useState(null)
+
+  const handleLogin = async(e)=>{
 
   e.preventDefault();
   try {
@@ -41,13 +47,20 @@ const handleLogin = async(e)=>{
     // Store the access token and refresh token in localStorage
     localStorage.setItem('accessToken', response.data.access);
     localStorage.setItem('refreshToken', response.data.refresh);
-    navigate('/main/reporters')  
-    console.log(response)
+    navigate('/reporters')  
+    console.log("🚀 ~ file: Login.js:46 ~ handleLogin ~ response:", response)
     
     // Redirect or perform other actions upon successful login
    
   } catch (error) {
-    console.error(error);
+    console.log("🚀 ~ file: Login.js:56 ~ handleLogin ~ error:", error)
+    setLoginError( error.response.data.detail)
+    setPassError( error.response.data.password)
+    setUserError( error.response.data.username)
+
+    console.log(error.response.data.detail)
+  //  console.log("🚀 ~ file: Login.js:27 ~ Login ~ username:", username)
+    // console.error(error);
   }
 }
   return (
@@ -61,16 +74,19 @@ const handleLogin = async(e)=>{
                   <CForm onSubmit={handleLogin}>
                     <h1>Login</h1>
                     <p className="text-medium-emphasis">Sign In to your account</p>
+                    <p className='text-danger fs-6 fw-bold py-2 m-0'>{userError? `${userError}!`: ''}</p>
                     <CInputGroup className="mb-3">
                       <CInputGroupText>
                         <CIcon icon={cilUser} />
                       </CInputGroupText>
                       <CFormInput placeholder="Username" value={username} onChange={(e)=>setUsername(e.target.value)} type='text' autoComplete="username" />
+                      <p></p>
                     </CInputGroup>
+                    {/* password */}
+                    <p className='text-danger fs-6 fw-bold py-2 m-0'>{passError? `${passError}!`: ''}</p>
                     <CInputGroup className="mb-4">
                       <CInputGroupText >
                         <CIcon icon={cilLockLocked} />
-                      
                       </CInputGroupText>
                       <CFormInput
                         value={password} 
@@ -80,6 +96,7 @@ const handleLogin = async(e)=>{
                         autoComplete="current-password"
                       />
                     </CInputGroup>
+                    <p className='text-danger fs-6 fw-bold py-2 m-0'>{loginError? `${loginError}!`: ''}</p>
                     <CRow>
                       <CCol xs={6}>
                         <CButton color="primary" type='submit' className="px-4">
@@ -98,10 +115,9 @@ const handleLogin = async(e)=>{
               <CCard className="text-white bg-primary py-5" style={{ width: '44%' }}>
                 <CCardBody className="text-center">
                   <div>
-                    <h2>Sign up</h2>
+                    <h2>New Here?</h2>
                     <p>
-                      Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod
-                      tempor incididunt ut labore et dolore magna aliqua.
+                      If you dont have an account signup now to get access to the coolest management system.
                     </p>
                     <Link to="/register">
                       <CButton color="primary" className="mt-3" active tabIndex={-1}>

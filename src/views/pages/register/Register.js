@@ -13,13 +13,14 @@ import {
 } from '@coreui/react'
 import CIcon from '@coreui/icons-react'
 import { cilLockLocked, cilUser } from '@coreui/icons'
-
+import {  useNavigate  } from 'react-router-dom'
 import axios from 'axios'
 
 const Register = () => {
   const [username, setUsername] = useState('')
   const [password, setPassword] = useState('')
   const [email, setEmail ] = useState('')
+  const navigate = useNavigate()
 
   const handleRegister = async(e)=>{
     e.preventDefault();
@@ -32,6 +33,7 @@ const Register = () => {
     try {
       const response = await axios.post('http://127.0.0.1:8000/auth/users/', payload)
       console.log("🚀 ~ file: Register.js:37 ~ handleRegister ~ response:", response)
+      navigate('/reporters')
 
     }
 

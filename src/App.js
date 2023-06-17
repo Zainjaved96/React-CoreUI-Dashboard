@@ -1,5 +1,5 @@
-import React, { Component, Suspense } from 'react'
-import { HashRouter, BrowserRouter, Route, Routes, Navigate } from 'react-router-dom'
+import React, {  Suspense } from 'react'
+import {  BrowserRouter, Route, Routes, Navigate } from 'react-router-dom'
 import './scss/style.scss'
 import { useAuthContext } from './context/AuthContext'
 
@@ -33,12 +33,8 @@ const App=() =>  {
             <Route exact path="/register" name="Register Page" element={<Register />} />
             <Route exact path="/404" name="Page 404" element={<Page404 />} />
             <Route exact path="/500" name="Page 500" element={<Page500 />} />
-
-            
-
+            {/* Redirect to login if not authenticated */}
             <Route path="*" name="Home" element={isAuth?<DefaultLayout />:<Navigate to="/login" replace/>} />
-           
-
           </Routes>
         </Suspense>
       </BrowserRouter>
