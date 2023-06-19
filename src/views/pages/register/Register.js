@@ -32,7 +32,6 @@ const Register = () => {
       }
     try {
       const response = await axios.post('http://127.0.0.1:8000/auth/users/', payload)
-      console.log("🚀 ~ file: Register.js:37 ~ handleRegister ~ response:", response)
       navigate('/reporters')
 
     }
