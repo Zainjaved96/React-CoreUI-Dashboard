@@ -23,6 +23,10 @@ import {
 } from '@coreui/react'
 import CIcon from '@coreui/icons-react'
 import * as icon from '@coreui/icons'
+import { useAuthContext } from 'src/context/AuthContext'
+
+
+
 const Reporters = () => {
   const [searchQuery, setSearchQuery] = useState('')
   const [url, setUrl] = useState(`http://127.0.0.1:8000/blog_service/article/?search_key=`)
@@ -36,11 +40,9 @@ const Reporters = () => {
   const [headline, setHeadline] = useState('')
   const [details, setDetails] = useState('')
   const [date, setDate] = useState('')
+  const {userId, logout} = useAuthContext()
 
-  const [reporterId, setReporterId] = useState(null)
-  const [reporterName, setReporterName] = useState('')
-
-  const [availableReporters, setAvailableReporters] = useState([])
+  
  
 
   const [publishers, setPublishers] = useState([])
@@ -56,14 +58,14 @@ const Reporters = () => {
     setShow(false)
     setHeadline('')
     setDetails('')
-    setReporterId('')
+   
   }
 
   const handleInfoClose = () => {
     setShowInfo(false)
     setHeadline('')
     setDetails('')
-    setReporterId('')
+  
     setPublishers([])
   }
 
@@ -76,26 +78,46 @@ const Reporters = () => {
         url = url + searchQuery
       }
 
-      const response = await axios.get(url)
+      const token = localStorage.getItem('accessToken'); // Replace 'your_token_here' with your actual token
+    
+      // Set the token in the request headers
+      const config = {
+        headers: {
+          Authorization: `Bearer ${token}`
+        }
+      };
+
+      const response = await axios.get(url,config)
       const accessToken = localStorage.getItem('accessToken');
       console.log("🚀 ~ file: Reporters.js:63 ~ fetchData ~ accessToken:", accessToken)
       
       // Set the headers with the access token for authentication
-      const config = {
-        headers: {
-          Authorization: `JWT ${accessToken}`,
-        },
-      };
-      const available_reporters = await axios.get('http://127.0.0.1:8000/blog_service/reporter/',config)
-      console.log(available_reporters)
-      setAvailableReporters(available_reporters.data.results)
-      console.log(availableReporters)
+      
+    
       setUsers(response.data.results.reverse())
       setCount(response.data.count)
       setNext(response.data.next)
       setPrev(response.data.previous)
       setIsLoading(false)
     } catch (error) {
+      if(error.response.status == 401){
+      
+        const refreshToken = localStorage.getItem('refreshToken');
+        const payload = {
+          refresh : refreshToken
+        }
+
+        try {
+          const response = await axios.post('http://127.0.0.1:8000/auth/jwt/refresh/', payload)
+          console.log('🎉 Token Refreshed' ,response.data.access)
+          localStorage.setItem('accessToken',response.data.access)
+        }
+        catch(error){
+          logout()
+        }
+        
+  
+      }
     
       console.error('Error fetching data:', error)
     }
@@ -112,13 +134,21 @@ const Reporters = () => {
     const newUser = {
       headline: headline,
       details: details,
-      reporter: reporterId,
+      user:userId ,
       publisher: publishers,
     }
 
     if (updating) {
       try {
-        await axios.put(`http://127.0.0.1:8000/blog_service/article/${updateId}`, newUser)
+        const token = localStorage.getItem('accessToken'); // Replace 'your_token_here' with your actual token
+    
+        // Set the token in the request headers
+        const config = {
+          headers: {
+            Authorization: `Bearer ${token}`
+          }
+        };
+        await axios.put(`http://127.0.0.1:8000/blog_service/article/${updateId}`, newUser,config)
         fetchData(url)
         // Reset the form after successful submission
 
@@ -130,7 +160,15 @@ const Reporters = () => {
       }
     } else {
       try {
-        await axios.post('http://127.0.0.1:8000/blog_service/article/', newUser)
+         const token = localStorage.getItem('accessToken'); // Replace 'your_token_here' with your actual token
+    
+        // Set the token in the request headers
+        const config = {
+          headers: {
+            Authorization: `Bearer ${token}`
+          }
+        };
+        await axios.post('http://127.0.0.1:8000/blog_service/article/', newUser, config)
         showNoti('successNotification')
         fetchData(url)
       } catch (error) {
@@ -174,7 +212,6 @@ const Reporters = () => {
     setDetails(user.details)
     setUpdating(true)
     setUpdateId(user.id)
-    setReporterId(user.reporter.id)
     setPublishers(publisherIds)
     // setCompany(company)
   }
@@ -185,9 +222,8 @@ const Reporters = () => {
     setHeadline(user.headline)
     setDetails(user.details)
     setUpdateId(user.id)
-    setReporterId(user.reporter.id)
-    setReporterName(user.reporter.first_name)
     setPublisherNames(user.publisher)
+ 
   }
 
   const handleNext = () => {
@@ -309,17 +345,7 @@ const Reporters = () => {
                 rows="3"
               ></textarea>
             </div>
-            <div className="mb-3">
-              <label htmlFor="lastName" className="form-label">
-                Reporter 
-              </label>
-              <select  value={reporterId} onChange={ (e) => setReporterId(e.target.value)} className="form-select" aria-label="Default select example">
-                {availableReporters ?  availableReporters.map((reporter,index)=>{
-                 return <option key={index} value={reporter.id}>{reporter.first_name}</option>
-                }): 'No reporters'}
-              </select>
-             
-            </div>
+           
             <div className="mb-3">
               <label htmlFor="lastName" className="form-label">
                 Publisher ID
@@ -356,10 +382,8 @@ const Reporters = () => {
                 <h6>{details}</h6>
                 <small className="text-muted p-t-30 db">Article Id</small>
                 <h6>{updateId}</h6>
-                <small className="text-muted">Reporter:</small>
-                <h6>{reporterName}</h6>
                 <small className="text-muted">Publishers:</small>
-                <h6>{publisherNames ? publisherNames.map((pub) => pub.name) : 'No Publisher Found'}</h6>
+                <h6>{publisherNames ? publisherNames.map((pub) => pub.name + " ") : 'No Publisher Found'}</h6>
               </div>
             </div>
           </div>
@@ -419,8 +443,8 @@ const Reporters = () => {
                         <CTableDataCell className="headline">{user.headline}</CTableDataCell>
                         <CTableDataCell>{user.details.substring(0, 30)}...</CTableDataCell>
                         <CTableDataCell className="details d-none">{user.details}</CTableDataCell>
-                        <CTableDataCell className="reporter-id d-none">{user.reporter.id}</CTableDataCell>
-                        <CTableDataCell className="reporter-name">{user.reporter.first_name}</CTableDataCell>
+                        <CTableDataCell className="reporter-id d-none">{user.user.id}</CTableDataCell>
+                        <CTableDataCell className="reporter-name">{user.user.username}</CTableDataCell>
                         <CTableDataCell className="publisher-name">
                           <div className="d-flex flex-column ">
                             {user.publisher.map((pub) => (

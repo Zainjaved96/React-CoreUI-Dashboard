@@ -52,13 +52,12 @@ const Widgets = React.lazy(() => import('./views/widgets/Widgets'))
 
 // Pages 
 
-const Reporters = React.lazy(()=>import('./views/pages/dashboard/Articles'))
 const Articles = React.lazy(()=>import('./views/pages/dashboard/Articles'))
 const Publishers = React.lazy(()=>import('./views/pages/dashboard/Publishers'))
 
 const routes = [
  
-  { path: 'reporters', name: 'Reporters', element: Reporters },
+ 
   { path: '/articles', name: 'Articles', element: Articles },
   { path: '/publishers', name: 'Publishers', element: Publishers },
 

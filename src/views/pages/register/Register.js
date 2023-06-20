@@ -31,7 +31,7 @@ const Register = () => {
         "password": password
       }
     try {
-      const response = await axios.post('http://127.0.0.1:8000/auth/users/', payload)
+      await axios.post('http://127.0.0.1:8000/auth/users/', payload)
       navigate('/reporters')
 
     }
@@ -40,8 +40,6 @@ const Register = () => {
       console.error("🚀 ~ file: Register.js:39 ~ handleRegister ~ error:", error)
     }
     
-
-
   }
   return (
     <div className="bg-light min-vh-100 d-flex flex-row align-items-center">

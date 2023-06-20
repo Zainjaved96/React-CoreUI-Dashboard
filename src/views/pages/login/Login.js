@@ -25,7 +25,7 @@ const Login = () => {
   const navigate = useNavigate(); 
   const [username, setUsername] = useState('')
   const [password, setPassword] = useState('')
-  const {isAuth,login} = useAuthContext()  
+  const {login, fetchId} = useAuthContext()  
 
   // Errors
   const [loginError , setLoginError] = useState(null)
@@ -41,19 +41,16 @@ const Login = () => {
       password, 
     });
 
-    login()
-    console.log("🚀 ~ file: Login.js:28 ~ Login ~ isAuth:", isAuth)
-
     // Store the access token and refresh token in localStorage
     localStorage.setItem('accessToken', response.data.access);
     localStorage.setItem('refreshToken', response.data.refresh);
-    navigate('/reporters')  
-    console.log("🚀 ~ file: Login.js:46 ~ handleLogin ~ response:", response)
+    login()
+    fetchId()
+    navigate('/articles')  
     
     // Redirect or perform other actions upon successful login
    
   } catch (error) {
-    console.log("🚀 ~ file: Login.js:56 ~ handleLogin ~ error:", error)
     setLoginError( error.response.data.detail)
     setPassError( error.response.data.password)
     setUserError( error.response.data.username)
