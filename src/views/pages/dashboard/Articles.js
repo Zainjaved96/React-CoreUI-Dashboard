@@ -74,54 +74,54 @@ const Reporters = () => {
   // Fetching articles data
   const fetchData = async (url) => {
     try {
-      if (searchQuery != '') {
-        url = url + searchQuery
+      if (searchQuery !== '') {
+        url += searchQuery;
       }
-
-      const token = localStorage.getItem('accessToken'); // Replace 'your_token_here' with your actual token
-    
-      // Set the token in the request headers
+  
+      const token = localStorage.getItem('accessToken');
+  
       const config = {
         headers: {
           Authorization: `Bearer ${token}`
         }
       };
-
-      const response = await axios.get(url,config)
-      const accessToken = localStorage.getItem('accessToken');
-      console.log("🚀 ~ file: Reporters.js:63 ~ fetchData ~ accessToken:", accessToken)
-      
-      // Set the headers with the access token for authentication
-      
-    
-      setUsers(response.data.results.reverse())
-      setCount(response.data.count)
-      setNext(response.data.next)
-      setPrev(response.data.previous)
-      setIsLoading(false)
-    } catch (error) {
-      if(error.response.status == 401){
-      
-        const refreshToken = localStorage.getItem('refreshToken');
-        const payload = {
-          refresh : refreshToken
-        }
-
-        try {
-          const response = await axios.post('http://127.0.0.1:8000/auth/jwt/refresh/', payload)
-          console.log('🎉 Token Refreshed' ,response.data.access)
-          localStorage.setItem('accessToken',response.data.access)
-        }
-        catch(error){
-          logout()
-        }
-        
   
+      const response = await axios.get(url, config);
+      const accessToken = response.data.access; // Assuming the token is returned in the response
+  
+      // Update the access token in local storage
+      localStorage.setItem('accessToken', accessToken);
+  
+      setUsers(response.data.results.reverse());
+      setCount(response.data.count);
+      setNext(response.data.next);
+      setPrev(response.data.previous);
+      setIsLoading(false);
+    } catch (error) {
+      console.error('Error fetching data:', error);
+  
+      if (error.response && error.response.status === 401) {
+        try {
+          const refreshToken = localStorage.getItem('refreshToken');
+          const payload = {
+            refresh: refreshToken
+          };
+  
+          const refreshResponse = await axios.post('http://127.0.0.1:8000/auth/jwt/refresh/', payload);
+          const newAccessToken = refreshResponse.data.access;
+  
+          // Update the access token in local storage
+          localStorage.setItem('accessToken', newAccessToken);
+  
+          console.log('🎉 Token Refreshed:', newAccessToken);
+          fetchData(url); // Retry fetching data with the new token
+        } catch (error) {
+          logout(); // Handle token refresh failure by logging out the user
+        }
       }
-    
-      console.error('Error fetching data:', error)
     }
-  }
+  };
+  
 
   // this will update data after first rendering and
   // anytime there's a change in search query
@@ -129,12 +129,15 @@ const Reporters = () => {
     fetchData(url)
   }, [searchQuery])
 
+  useEffect(() => {
+    console.log(users)
+  }, [users])
+
   const handleSubmit = async (event) => {
     event.preventDefault()
     const newUser = {
       headline: headline,
       details: details,
-      user:userId ,
       publisher: publishers,
     }
 
@@ -459,7 +462,7 @@ const Reporters = () => {
                             </div>
                           ))}
                         </CTableDataCell>
-                        <CTableDataCell className="created">{user.created_at.substring(0, 10)}</CTableDataCell>
+                        {/* <CTableDataCell className="created">{user.created_at.substring(0, 10)}</CTableDataCell> */}
                         <CTableDataCell>
                           <div className="d-flex gap-2">
                             <a id={user.id} onClick={() => handleInfo(user)} className="btn btn-dark">

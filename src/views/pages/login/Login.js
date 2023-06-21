@@ -25,7 +25,7 @@ const Login = () => {
   const navigate = useNavigate(); 
   const [username, setUsername] = useState('')
   const [password, setPassword] = useState('')
-  const {login, fetchId} = useAuthContext()  
+  const {login} = useAuthContext()  
 
   // Errors
   const [loginError , setLoginError] = useState(null)
@@ -45,7 +45,7 @@ const Login = () => {
     localStorage.setItem('accessToken', response.data.access);
     localStorage.setItem('refreshToken', response.data.refresh);
     login()
-    fetchId()
+ 
     navigate('/articles')  
     
     // Redirect or perform other actions upon successful login

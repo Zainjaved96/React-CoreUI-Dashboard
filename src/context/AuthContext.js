@@ -10,30 +10,7 @@ const AuthProvider = ({ children }) => {
     const [isAuth, setIsAuth] = useState(false);
     const [userId, setUserId] = useState(null);
 
-    const fetchId = async () => {
-      try {
-        const token = localStorage.getItem('accessToken'); // Replace 'your_token_here' with your actual token
-        console.log("🚀 ~ file: AuthContext.js:16 ~ fetchId ~ token:", token)
-    
-        // Set the token in the request headers
-        const config = {
-          headers: {
-            Authorization: `Bearer ${token}`
-          }
-        };
-    
-        // Make the API request
-        const response = await axios.get('http://127.0.0.1:8000/auth/users/me/', config);
-        console.log("🚀 ~ file: AuthContext.js:26 ~ fetchId ~ response:", response)
-    
-        // Handle the response
-        console.log(response.data.id);
-        setUserId(response.data.id)
-      } catch (error) {
-        // Handle the error
-        console.error(error);
-      }
-    };
+
     
 
     const login = () => {
@@ -51,7 +28,7 @@ const AuthProvider = ({ children }) => {
       isAuth,
       login,
       logout,
-      fetchId,
+     
       userId
     };
   
