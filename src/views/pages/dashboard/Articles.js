@@ -1,6 +1,6 @@
 import React from 'react'
 import { useState, useEffect } from 'react'
-import axios from 'axios'
+import axios from 'src/interceptors/interceptors'
 import Button from 'react-bootstrap/Button'
 import Modal from 'react-bootstrap/Modal'
 import { AiFillDelete, AiTwotoneEdit, AiFillInfoCircle } from 'react-icons/ai'
@@ -78,19 +78,9 @@ const Reporters = () => {
         url += searchQuery;
       }
   
-      const token = localStorage.getItem('accessToken');
   
-      const config = {
-        headers: {
-          Authorization: `Bearer ${token}`
-        }
-      };
-  
-      const response = await axios.get(url, config);
+      const response = await axios.get(url);
       const accessToken = response.data.access; // Assuming the token is returned in the response
-  
-      // Update the access token in local storage
-      localStorage.setItem('accessToken', accessToken);
   
       setUsers(response.data.results.reverse());
       setCount(response.data.count);
@@ -99,27 +89,27 @@ const Reporters = () => {
       setIsLoading(false);
     } catch (error) {
       console.error('Error fetching data:', error);
-  
-      if (error.response && error.response.status === 401) {
-        try {
-          const refreshToken = localStorage.getItem('refreshToken');
-          const payload = {
-            refresh: refreshToken
-          };
-  
-          const refreshResponse = await axios.post('http://127.0.0.1:8000/auth/jwt/refresh/', payload);
-          const newAccessToken = refreshResponse.data.access;
-  
-          // Update the access token in local storage
-          localStorage.setItem('accessToken', newAccessToken);
-  
-          console.log('🎉 Token Refreshed:', newAccessToken);
-          fetchData(url); // Retry fetching data with the new token
-        } catch (error) {
-          logout(); // Handle token refresh failure by logging out the user
-        }
-      }
     }
+    //   if (error.response && error.response.status === 401) {
+    //     try {
+    //       const refreshToken = localStorage.getItem('refreshToken');
+    //       const payload = {
+    //         refresh: refreshToken
+    //       };
+  
+    //       const refreshResponse = await axios.post('http://127.0.0.1:8000/auth/jwt/refresh/', payload);
+    //       const newAccessToken = refreshResponse.data.access;
+  
+    //       // Update the access token in local storage
+    //       localStorage.setItem('accessToken', newAccessToken);
+  
+    //       console.log('🎉 Token Refreshed:', newAccessToken);
+    //       fetchData(url); // Retry fetching data with the new token
+    //     } catch (error) {
+    //       logout(); // Handle token refresh failure by logging out the user
+    //     }
+    //   }
+    // }
   };
   
 
@@ -143,15 +133,7 @@ const Reporters = () => {
 
     if (updating) {
       try {
-        const token = localStorage.getItem('accessToken'); // Replace 'your_token_here' with your actual token
-    
-        // Set the token in the request headers
-        const config = {
-          headers: {
-            Authorization: `Bearer ${token}`
-          }
-        };
-        await axios.put(`http://127.0.0.1:8000/blog_service/article/${updateId}`, newUser,config)
+        await axios.put(`http://127.0.0.1:8000/blog_service/article/${updateId}`, newUser)
         fetchData(url)
         // Reset the form after successful submission
 
@@ -163,15 +145,8 @@ const Reporters = () => {
       }
     } else {
       try {
-         const token = localStorage.getItem('accessToken'); // Replace 'your_token_here' with your actual token
-    
-        // Set the token in the request headers
-        const config = {
-          headers: {
-            Authorization: `Bearer ${token}`
-          }
-        };
-        await axios.post('http://127.0.0.1:8000/blog_service/article/', newUser, config)
+        
+        await axios.post('http://127.0.0.1:8000/blog_service/article/', newUser)
         showNoti('successNotification')
         fetchData(url)
       } catch (error) {
@@ -193,7 +168,7 @@ const Reporters = () => {
     }, 2000)
   }
 
-  const handleDelete = async (id, event) => {
+  const handleDelete = async (id) => {
     const userId = id
     try {
       const response = await axios.delete(`http://127.0.0.1:8000/blog_service/article/${userId}`)
@@ -426,12 +401,11 @@ const Reporters = () => {
                     <CTableHeaderCell>id</CTableHeaderCell>
                     <CTableHeaderCell>Headline</CTableHeaderCell>
                     <CTableHeaderCell>Description</CTableHeaderCell>
-                    <CTableHeaderCell className="d-none">Reporter id</CTableHeaderCell>
                     <CTableHeaderCell>Written by </CTableHeaderCell>
+                    <CTableHeaderCell>Username</CTableHeaderCell>
                     <CTableHeaderCell>Published by </CTableHeaderCell>
-                    <CTableHeaderCell className="d-none">Publishers id</CTableHeaderCell>
-                    <CTableHeaderCell>Created at</CTableHeaderCell>
                     <CTableHeaderCell>Actions</CTableHeaderCell>
+                   
                   </CTableRow>
                 </CTableHead>
                 <CTableBody>
@@ -445,10 +419,9 @@ const Reporters = () => {
                         <CTableDataCell className="user-id">{user.id}</CTableDataCell>
                         <CTableDataCell className="headline">{user.headline}</CTableDataCell>
                         <CTableDataCell>{user.details.substring(0, 30)}...</CTableDataCell>
-                        <CTableDataCell className="details d-none">{user.details}</CTableDataCell>
-                        <CTableDataCell className="reporter-id d-none">{user.user.id}</CTableDataCell>
+                        <CTableDataCell className="reporter-id ">{user.user.first_name}</CTableDataCell>
                         <CTableDataCell className="reporter-name">{user.user.username}</CTableDataCell>
-                        <CTableDataCell className="publisher-name">
+                        <CTableDataCell className="publisher-name"> 
                           <div className="d-flex flex-column ">
                             {user.publisher.map((pub) => (
                               <div key={pub.id}>{`${pub.name} `}</div>
@@ -477,7 +450,7 @@ const Reporters = () => {
                             </button>
                             <button
                               id={user.id}
-                              onClick={(evt) => handleDelete(user.id, evt)}
+                              onClick={(evt) => handleDelete(user.id)}
                               className="btn btn-light text-white"
                             >
                               <AiFillDelete size={25} style={{ color: 'red' }} />
