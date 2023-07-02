@@ -43,7 +43,10 @@ const Login = () => {
 
     // Store the access token and refresh token in localStorage
     localStorage.setItem('accessToken', response.data.access);
+    console.log("🚀 ~ file: Login.js:46 ~ handleLogin ~ response.data.access:", response.data.access)
     localStorage.setItem('refreshToken', response.data.refresh);
+    console.log("🚀 ~ file: Login.js:48 ~ handleLogin ~ response.data.refresh:", response.data.refresh)
+    
     login()
  
     navigate('/articles')  

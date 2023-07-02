@@ -120,7 +120,6 @@ const Reporters = () => {
   }, [searchQuery])
 
   useEffect(() => {
-    console.log(users)
   }, [users])
 
   const handleSubmit = async (event) => {

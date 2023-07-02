@@ -21,14 +21,12 @@ const AuthProvider = ({ children }) => {
         localStorage.setItem('accessToken', '');
         localStorage.setItem('refreshToken', '');
         setIsAuth(false);
-        
     };
   
     const authContextValue = {
       isAuth,
       login,
       logout,
-     
       userId
     };
   
