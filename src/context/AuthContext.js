@@ -10,9 +10,6 @@ const AuthProvider = ({ children }) => {
     const [isAuth, setIsAuth] = useState(false);
     const [userId, setUserId] = useState(null);
 
-
-    
-
     const login = () => {
       setIsAuth(true);
     };

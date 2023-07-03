@@ -17,16 +17,31 @@ import CIcon from '@coreui/icons-react'
 import { cilEnvelopeClosed
 } from '@coreui/icons'
 import { useState } from 'react'
+import axios from 'axios'
 // import axios from 'axios'
-// import { useNavigate } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 // import { useAuthContext } from 'src/context/AuthContext'
 
 const PasswordReset = () => {
 
 //   const navigate = useNavigate(); 
   const [Email, setEmail] = useState('')
+  const navigate = useNavigate()
+  const handlePasswordReset = async(e) => {
+    e.preventDefault()  
+    try {
+        await axios.post('http://127.0.0.1:8000/user/users/reset_password/',{
+          email:Email
+        })
+        console.log('email sent successfully')
+        navigate('/email-sent')
 
-  
+    }
+    catch(error){
+      console.error(error)
+
+    }
+  }
   return (
     <div className="bg-light min-vh-100 d-flex flex-row align-items-center">
       <CContainer>
@@ -35,7 +50,7 @@ const PasswordReset = () => {
             <CCardGroup>
               <CCard className="p-4">
                 <CCardBody>
-                  <CForm >
+                  <CForm onSubmit={handlePasswordReset} >
                     <h1>Password Recovery</h1>
                     <p className="text-medium-emphasis">We will send a link to this email shortly.</p>
                     <CInputGroup className="mb-3">
