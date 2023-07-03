@@ -32,8 +32,8 @@ const responseInterceptor = axios.interceptors.response.use(
     return response;
   },
   async (error) => {
-    const navigate = useNavigate()
-    const {logout} = useAuthContext
+    // const navigate = useNavigate()
+    // const {logout} = useAuthContext
     console.error('Response Error Interceptor:', error);
   
     // Handle specific error types
@@ -58,8 +58,8 @@ const responseInterceptor = axios.interceptors.response.use(
         console.error('Token Refresh Error:', refreshError);
         // Handle the token refresh error
         // For example, redirect to the login page or show an error message
-        logout()
-        navigate('/login')
+        // logout()
+        // navigate('/login')
         throw refreshError;
       }
     }

@@ -1,6 +1,5 @@
 import React from 'react'
 import { useState, useEffect } from 'react'
-import axios from 'src/interceptors/interceptors'
 import Button from 'react-bootstrap/Button'
 import Modal from 'react-bootstrap/Modal'
 import { AiFillDelete, AiTwotoneEdit, AiFillInfoCircle } from 'react-icons/ai'
@@ -24,6 +23,7 @@ import {
 import CIcon from '@coreui/icons-react'
 import * as icon from '@coreui/icons'
 import { useAuthContext } from 'src/context/AuthContext'
+import axios from 'src/interceptors/interceptors'
 
 
 
@@ -41,9 +41,6 @@ const Reporters = () => {
   const [details, setDetails] = useState('')
   const [date, setDate] = useState('')
   const {userId, logout} = useAuthContext()
-
-  
- 
 
   const [publishers, setPublishers] = useState([])
   const [publisherNames, setPublisherNames] = useState('')
@@ -90,26 +87,7 @@ const Reporters = () => {
     } catch (error) {
       console.error('Error fetching data:', error);
     }
-    //   if (error.response && error.response.status === 401) {
-    //     try {
-    //       const refreshToken = localStorage.getItem('refreshToken');
-    //       const payload = {
-    //         refresh: refreshToken
-    //       };
-  
-    //       const refreshResponse = await axios.post('http://127.0.0.1:8000/auth/jwt/refresh/', payload);
-    //       const newAccessToken = refreshResponse.data.access;
-  
-    //       // Update the access token in local storage
-    //       localStorage.setItem('accessToken', newAccessToken);
-  
-    //       console.log('🎉 Token Refreshed:', newAccessToken);
-    //       fetchData(url); // Retry fetching data with the new token
-    //     } catch (error) {
-    //       logout(); // Handle token refresh failure by logging out the user
-    //     }
-    //   }
-    // }
+   
   };
   
 
@@ -120,6 +98,7 @@ const Reporters = () => {
   }, [searchQuery])
 
   useEffect(() => {
+    console.log(users)
   }, [users])
 
   const handleSubmit = async (event) => {

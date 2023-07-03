@@ -18,7 +18,7 @@ import {  cilLockLocked
 } from '@coreui/icons'
 import { useState } from 'react'
 // import axios from 'axios'
-// import { useNavigate } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 // import { useAuthContext } from 'src/context/AuthContext'
 
 const PasswordReset = () => {
@@ -26,7 +26,21 @@ const PasswordReset = () => {
 //   const navigate = useNavigate(); 
   const [password, setPassword] = useState('')
   const [passwordConfirm, setPasswordConfirm] = useState('')
+  const navigate = useNavigate()
 
+
+  const handleSubmit = (e)=>{
+      e.preventDefault()
+      try {
+
+        // Redirect after confirmation
+        navigate('/login')
+      }
+      catch(error){
+        console.error(error)
+        alert('Something went wrong')
+      }
+  }
   
   return (
     <div className="bg-light min-vh-100 d-flex flex-row align-items-center">
@@ -35,8 +49,8 @@ const PasswordReset = () => {
           <CCol md={8}>
             <CCardGroup>
               <CCard className="p-4">
-                <CCardBody>
-                  <CForm >
+                <CCardBody >
+                  <CForm onSubmit={handleSubmit} >
                     <h1>Set a New Password</h1>
                     <p className="text-medium-emphasis">Make sure the password is strong.</p>
                     <CInputGroup className="mb-4">
