@@ -17,7 +17,7 @@ import CIcon from '@coreui/icons-react'
 import {  cilLockLocked
 } from '@coreui/icons'
 import { useState } from 'react'
-// import axios from 'axios'
+import axios from 'axios'
 import { useNavigate } from 'react-router-dom';
 // import { useAuthContext } from 'src/context/AuthContext'
 
@@ -25,14 +25,23 @@ const PasswordReset = () => {
 
 //   const navigate = useNavigate(); 
   const [password, setPassword] = useState('')
-  const [passwordConfirm, setPasswordConfirm] = useState('')
   const navigate = useNavigate()
+  const url = new URL(window.location.href);
+  const searchParams = new URLSearchParams(url.search);
 
+  const uuid = searchParams.get('uuid');
+  const token = searchParams.get('token');
 
-  const handleSubmit = (e)=>{
+  const handleSubmit = async (e)=>{
       e.preventDefault()
       try {
+        const payload = {
+          "uid": uuid,
+          "token": token,
+          "new_password": password
+        }
 
+        await axios.post('http://127.0.0.1:8000/user/users/reset_password_confirm/',payload)
         // Redirect after confirmation
         navigate('/login')
       }
@@ -66,18 +75,7 @@ const PasswordReset = () => {
                       />
                     </CInputGroup>
 
-                    <CInputGroup className="mb-4">
-                      <CInputGroupText >
-                        <CIcon icon={cilLockLocked} />
-                      </CInputGroupText>
-                      <CFormInput
-                        value={passwordConfirm} 
-                        onChange={(e)=>setPasswordConfirm(e.target.value)} 
-                        type="password"
-                        placeholder="Confirm Your Password"
-                        autoComplete="current-password"
-                      />
-                    </CInputGroup>
+                  
                     {/* password */}
                    
                     <CRow>

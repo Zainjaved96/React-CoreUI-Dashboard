@@ -1,7 +1,7 @@
 import axios from 'axios';
-import { useNavigate } from 'react-router-dom';
-import { useAuthContext } from 'src/context/AuthContext'
-// Create a request interceptor
+// import { useNavigate } from 'react-router-dom';
+// import { useAuthContext } from 'src/context/AuthContext'
+// // Create a request interceptor
 
 
 const requestInterceptor = axios.interceptors.request.use(
