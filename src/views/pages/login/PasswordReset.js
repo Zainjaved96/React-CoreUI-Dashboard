@@ -21,16 +21,22 @@ import axios from 'axios'
 // import axios from 'axios'
 import { useNavigate } from 'react-router-dom';
 // import { useAuthContext } from 'src/context/AuthContext'
+import Loader1 from '../Loader/Loader1'
 
 const PasswordReset = () => {
 
 //   const navigate = useNavigate(); 
   const [Email, setEmail] = useState('')
   const navigate = useNavigate()
+  const [isLoading, setIsLoading] = useState(false);
+
+
+
   const handlePasswordReset = async(e) => {
+    setIsLoading(true)
     e.preventDefault()  
     try {
-        await axios.post('http://127.0.0.1:8000/user/users/reset_password/',{
+       await axios.post('http://127.0.0.1:8000/user/users/reset_password/',{
           email:Email
         })
         console.log('email sent successfully')
@@ -38,11 +44,14 @@ const PasswordReset = () => {
 
     }
     catch(error){
+      setIsLoading(true)
       console.error(error)
 
     }
   }
   return (
+    <>
+    {isLoading ? <Loader1/> : ''}
     <div className="bg-light min-vh-100 d-flex flex-row align-items-center">
       <CContainer>
         <CRow className="justify-content-center">
@@ -93,6 +102,7 @@ const PasswordReset = () => {
         </CRow>
       </CContainer>
     </div>
+    </>
   )
 }
 
